@@ -1,2 +1,3 @@
-# bina-y-netim-erp
-Exported from Caffeine project: Bina Yönetim ERP
+## 
+
+To run app build and run docker image: `docker build -t app . docker run -it --network host app`

@@ -1,0 +1,349 @@
+{
+  "schemaVersion": "1.0.0",
+  "projectStateVersion": 13,
+  "summary": "Bina Yönetim ERP Uygulaması - Multi-tenant, rol bazlı bina yönetim sistemi. Internet Identity tek kimlik doğrulama yöntemi. Davet kodu giriş yöntemi değil, rol ve bina eşleştirme aracıdır. Kullanıcılar Internet Identity ile giriş yapar, binaya bağlı değilse davet kodu girer veya bina oluşturur. Onboarding akışı: Bina Sahibi (bina oluşturma), Yetkili (davet kodu), Sakin/Personel (davet kodu).",
+  "architectural_notes": [
+    "Internet Identity tek kimlik doğrulama yöntemi",
+    "3 seviyeli hiyerarşi: Bina Hesabı → Bina Yetkilisi → Daire Sakini/Personel",
+    "Rol bazlı yetkilendirme sistemi (sonraki fazda eklenecek)",
+    "Aşamalı geliştirme stratejisi: Kimlik → Kullanıcı Yönetimi → Davet Kodu → Rol Sistemi → ERP Modülleri",
+    "Backend: Motoko, Frontend: React + TypeScript + Tailwind CSS",
+    "Türkçe arayüz ve mobil uyumlu tasarım",
+    "Gerçek zamanlı bildirim yerine uygulama açılınca güncelleme yaklaşımı",
+    "Aidat modülü: Sadece takip ve manuel işaretleme, gerçek ödeme entegrasyonu yok",
+    "Multi-tenant yapı öncelikli: Tenant yapısı rol ve davet sisteminden önce kurulmalı",
+    "Internet Identity = Kimlik doğrulama (tek giriş yöntemi)"
+  ],
+  "known_issues": [],
+  "isFixRequest": false,
+  "existing_features": [
+    {
+      "id": "feature-implement-internet-identity-authentication-system-that-allows-users-to-log-in-using-their-internet-identity-principal",
+      "title": "Implement Internet Identity authentication system that allows users to log in using their Internet Identity principal",
+      "reqIds": [
+        "REQ-1"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-build-welcome-dashboard-that-displays-a-welcome-message-the-user-s-principal-id-and-indicates-whether-this-is-their-first-login-to-the-system",
+      "title": "Build welcome dashboard that displays a welcome message, the user's Principal ID, and indicates whether this is their first login to the system",
+      "reqIds": [
+        "REQ-3"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-navigation-structure-with-ana-sayfa-home-and-profil-profile-menu-items-designed-to-accommodate-future-expansion-while-keeping-initial-content-minimal",
+      "title": "Implement navigation structure with Ana Sayfa (Home) and Profil (Profile) menu items, designed to accommodate future expansion while keeping initial content minimal",
+      "reqIds": [
+        "REQ-4"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-ensure-all-user-interface-text-is-in-turkish-and-the-application-is-fully-responsive-for-mobile-devices",
+      "title": "Ensure all user interface text is in Turkish and the application is fully responsive for mobile devices",
+      "reqIds": [
+        "REQ-5"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-a-user-list-page-that-displays-all-registered-users-in-the-system-showing-their-principal-id-first-login-date-and-last-login-date-for-each-user",
+      "title": "Create a user list page that displays all registered users in the system, showing their Principal ID, first login date, and last login date for each user",
+      "reqIds": [
+        "REQ-7"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-a-user-profile-detail-page-that-displays-detailed-information-when-a-user-is-selected-from-the-list-showing-principal-id-first-login-date-last-login-date-and-total-login-count",
+      "title": "Create a user profile detail page that displays detailed information when a user is selected from the list, showing Principal ID, first login date, last login date, and total login count",
+      "reqIds": [
+        "REQ-8"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-kullan-c-lar-users-navigation-menu-item-that-links-to-the-user-list-page",
+      "title": "Add a 'Kullanıcılar' (Users) navigation menu item that links to the user list page",
+      "reqIds": [
+        "REQ-11"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-ana-sayfa-home-page-frontend-to-conditionally-display-building-status-if-the-user-is-not-associated-with-a-building-show-the-message-hen-z-bir-binaya-ba-l-de-ilsiniz-with-a-bina-olu-tur-button-that-opens-a-building-creation-form-if-the-user-is-associated-with-a-building-display-the-building-name",
+      "title": "Update the Ana Sayfa (Home page) frontend to conditionally display building status: if the user is not associated with a building, show the message 'Henüz bir binaya bağlı değilsiniz' with a 'Bina Oluştur' button that opens a building creation form; if the user is associated with a building, display the building name",
+      "reqIds": [
+        "REQ-16"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-a-building-creation-form-component-in-the-frontend-that-accepts-a-building-name-input-validates-the-input-calls-the-binaolustur-backend-function-and-displays-success-or-error-feedback-in-turkish",
+      "title": "Create a building creation form component in the frontend that accepts a building name input, validates the input, calls the binaOlustur backend function, and displays success or error feedback in Turkish",
+      "reqIds": [
+        "REQ-17"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-role-column-to-the-users-list-page-kullan-c-lar-that-displays-each-user-s-role-bina-sahibi-yetkili-or-sakin-in-turkish",
+      "title": "Add a Role column to the Users list page (Kullanıcılar) that displays each user's role (BINA_SAHIBI, YETKILI, or SAKIN) in Turkish",
+      "reqIds": [
+        "REQ-21"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-display-the-user-s-role-on-the-profile-detail-page-profil-showing-the-role-name-in-turkish",
+      "title": "Display the user's role on the Profile detail page (Profil) showing the role name in Turkish",
+      "reqIds": [
+        "REQ-22"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-establish-the-infrastructure-on-the-home-page-ana-sayfa-to-conditionally-render-content-based-on-user-role-even-though-all-roles-will-display-the-same-content-initially",
+      "title": "Establish the infrastructure on the Home page (Ana Sayfa) to conditionally render content based on user role, even though all roles will display the same content initially",
+      "reqIds": [
+        "REQ-23"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-a-frontend-invite-code-management-panel-component-on-the-ana-sayfa-home-page-that-displays-only-for-users-with-bina-sahibi-role-showing-a-form-to-create-new-invite-codes-by-selecting-a-role-yetkili-or-sakin-and-a-table-listing-all-created-codes-with-their-details-code-string-role-creation-date-usage-status",
+      "title": "Create a frontend invite code management panel component on the Ana Sayfa (Home) page that displays only for users with BINA_SAHIBI role, showing a form to create new invite codes by selecting a role (YETKILI or SAKIN), and a table listing all created codes with their details (code string, role, creation date, usage status)",
+      "reqIds": [
+        "REQ-28"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-an-invite-code-registration-option-to-the-login-page-that-displays-an-input-field-for-entering-a-16-digit-invite-code-validates-the-code-format-calls-the-davetkoduilekayitol-backend-function-when-submitted-and-redirects-to-the-home-page-on-successful-registration-with-appropriate-success-error-feedback-in-turkish",
+      "title": "Add an invite code registration option to the Login page that displays an input field for entering a 16-digit invite code, validates the code format, calls the davetKoduIleKayitOl backend function when submitted, and redirects to the Home page on successful registration with appropriate success/error feedback in Turkish",
+      "reqIds": [
+        "REQ-29"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-react-query-hooks-for-invite-code-operations-usecreateinvitecode-mutation-for-creating-codes-uselistinvitecodes-query-for-fetching-user-s-codes-and-useregisterwithinvitecode-mutation-for-registering-with-a-code-with-automatic-cache-invalidation-on-successful-operations",
+      "title": "Create React Query hooks for invite code operations: useCreateInviteCode mutation for creating codes, useListInviteCodes query for fetching user's codes, and useRegisterWithInviteCode mutation for registering with a code, with automatic cache invalidation on successful operations",
+      "reqIds": [
+        "REQ-30"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-remove-the-invite-code-registration-option-completely-from-the-login-page-frontend-src-pages-login-tsx-leaving-only-the-internet-identity-authentication-button",
+      "title": "Remove the invite code registration option completely from the Login page (frontend/src/pages/Login.tsx), leaving only the Internet Identity authentication button",
+      "reqIds": [
+        "REQ-31"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-home-page-frontend-src-pages-home-tsx-to-conditionally-render-based-on-whether-the-user-is-associated-with-a-building-if-user-has-no-building-display-a-centered-onboarding-section-with-bina-olu-tur-create-building-button-and-davet-kodu-gir-enter-invite-code-input-field-with-submit-button-if-user-has-a-building-display-the-normal-role-based-panel-content",
+      "title": "Update the Home page (frontend/src/pages/Home.tsx) to conditionally render based on whether the user is associated with a building: if user has no building, display a centered onboarding section with 'Bina Oluştur' (Create Building) button and 'Davet Kodu Gir' (Enter Invite Code) input field with submit button; if user has a building, display the normal role-based panel content",
+      "reqIds": [
+        "REQ-32"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-move-the-invitecoderegistration-component-functionality-from-the-login-page-to-the-home-page-onboarding-section-integrating-it-as-the-davet-kodu-gir-field-that-appears-for-users-without-a-building-assignment",
+      "title": "Move the InviteCodeRegistration component functionality from the Login page to the Home page onboarding section, integrating it as the 'Davet Kodu Gir' field that appears for users without a building assignment",
+      "reqIds": [
+        "REQ-33"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-home-page-layout-to-ensure-the-onboarding-section-with-bina-olu-tur-and-davet-kodu-gir-is-visually-clear-and-welcoming-with-proper-spacing-card-based-design-consistent-with-existing-ui-patterns-and-clear-action-prompts-in-turkish",
+      "title": "Update the Home page layout to ensure the onboarding section (with 'Bina Oluştur' and 'Davet Kodu Gir') is visually clear and welcoming, with proper spacing, card-based design consistent with existing UI patterns, and clear action prompts in Turkish",
+      "reqIds": [
+        "REQ-34"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-ensure-that-after-a-user-successfully-creates-a-building-via-the-bina-olu-tur-button-on-the-home-page-the-page-automatically-refreshes-or-updates-to-show-the-normal-role-based-panel-content-instead-of-the-onboarding-section",
+      "title": "Ensure that after a user successfully creates a building via the 'Bina Oluştur' button on the home page, the page automatically refreshes or updates to show the normal role-based panel content instead of the onboarding section",
+      "reqIds": [
+        "REQ-35"
+      ],
+      "version": 1
+    }
+  ],
+  "new_feature_requests": [
+    {
+      "id": "AR-6",
+      "summary": "Create backend user registration system that stores Principal ID, first login timestamp, and last login timestamp for each authenticated user",
+      "reqIds": [
+        "REQ-2"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-10",
+      "summary": "Design the backend architecture to support future role-based access and multi-tenant functionality without requiring major refactoring, even though these features are not implemented in this phase",
+      "reqIds": [
+        "REQ-6"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-16",
+      "summary": "Add backend function to retrieve a list of all registered users with their Principal ID, first login timestamp, and last login timestamp",
+      "reqIds": [
+        "REQ-9"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-17",
+      "summary": "Implement login count tracking in the backend user profile system to record the total number of logins for each user",
+      "reqIds": [
+        "REQ-10"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-21",
+      "summary": "Create a Bina (Building/Tenant) data model in the backend with fields: binaId (unique identifier), binaAdi (building name), olusturulmaTarihi (creation timestamp), olusturanPrincipal (creator's Principal ID)",
+      "reqIds": [
+        "REQ-12"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-22",
+      "summary": "Add a nullable binaId field to the existing User/Profile model in the backend to establish the user-building relationship, where each user can be associated with at most one building",
+      "reqIds": [
+        "REQ-13"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-23",
+      "summary": "Implement a binaOlustur(binaAdi: Text) backend function that creates a new building with the provided name, automatically assigns the calling user as the building owner, and links the user to the newly created building by setting their binaId",
+      "reqIds": [
+        "REQ-14"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-24",
+      "summary": "Implement a kullaniciBinasiniGetir() backend function that retrieves the building information associated with the authenticated user, returning null if the user is not linked to any building",
+      "reqIds": [
+        "REQ-15"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-30",
+      "summary": "Add a role field to the User/Profile model in the backend that stores one of three possible values: BINA_SAHIBI (Building Owner), YETKILI (Authority), or SAKIN (Resident)",
+      "reqIds": [
+        "REQ-18"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-31",
+      "summary": "Modify the binaOlustur function in the backend to automatically assign the BINA_SAHIBI role to the user who creates a building",
+      "reqIds": [
+        "REQ-19"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-32",
+      "summary": "Update the backend API to return the user's role as part of the profile data when queried by kullaniciBilgisiniGetir or similar functions",
+      "reqIds": [
+        "REQ-20"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-33",
+      "summary": "16 haneli benzersiz davet kodu oluşturma sistemi",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-34",
+      "summary": "Davet kodu modeli: kod, binaId, rol, oluşturan, oluşturma tarihi, kullanıldı mı, kullanım tarihi",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-35",
+      "summary": "BINA_SAHIBI kullanıcılar için davet kodu oluşturma fonksiyonu",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-36",
+      "summary": "Davet kodu ile kayıt/giriş fonksiyonu: kod doğrulama, kullanıcıyı binaya ve role atama",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-37",
+      "summary": "Ana sayfa: BINA_SAHIBI için davet kodu yönetim paneli (kod oluşturma, mevcut kodları listeleme)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-39",
+      "summary": "Create a backend data model for invite codes (DavetKodu) with fields: kod (16-character unique code string), binaId (building identifier), rol (role to be assigned: BINA_SAHIBI, YETKILI, or SAKIN), olusturanPrincipal (creator's Principal ID), olusturmaTarihi (creation timestamp), kullanilidMi (boolean indicating if code was used), kullanimTarihi (optional timestamp when code was used), and kullananPrincipal (optional Principal ID of user who used the code)",
+      "reqIds": [
+        "REQ-24"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-40",
+      "summary": "Implement backend function davetKoduOlustur(rol: Role) that generates a unique 16-digit alphanumeric invite code, creates a new DavetKodu record associated with the authenticated user's building and specified role, stores it in stable storage, and returns the generated code",
+      "reqIds": [
+        "REQ-25"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-41",
+      "summary": "Implement backend function davetKoduIleKayitOl(kod: Text) that validates the invite code, verifies it is unused, assigns the authenticated user to the code's building and role, marks the code as used with timestamp and user principal, and returns success or appropriate error messages",
+      "reqIds": [
+        "REQ-26"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-42",
+      "summary": "Implement backend function davetKodlariniListele() that returns an array of all invite codes created by the authenticated user, including code string, assigned role, creation date, usage status, and usage date if applicable",
+      "reqIds": [
+        "REQ-27"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-43",
+      "summary": "Login sayfasından davet kodu ile giriş seçeneğini kaldır - sadece Internet Identity ile giriş kalacak",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-44",
+      "summary": "Ana sayfada binaya bağlı olmayan kullanıcılar için 'Bina Oluştur' ve 'Davet Kodu Gir' seçeneklerini göster, binaya bağlı kullanıcılar için normal panel göster",
+      "reqIds": [],
+      "status": "pending"
+    }
+  ],
+  "gameProjectType": "none",
+  "projectName": "Bina Yönetim ERP Uygulaması",
+  "clarification_mode": "instant",
+  "clarification_rounds": 0
+}

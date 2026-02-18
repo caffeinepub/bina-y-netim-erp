@@ -1,0 +1,18 @@
+{
+  "frontend/src/App.tsx": "Main application component with TanStack Router configuration, authentication context, and protected route handling for dashboard, home, profile, and users pages.",
+  "frontend/src/pages/Login.tsx": "Simplified login page showing only Internet Identity authentication option with centered card layout and Turkish instructions.",
+  "frontend/src/pages/Dashboard.tsx": "Dashboard page displaying welcome message, user profile information, first login indicator, and system information using the caller's user profile from the backend.",
+  "frontend/src/pages/Home.tsx": "Home page with conditional rendering that shows onboarding section (building creation and invite code entry) for users without buildings, or role-based dashboard for users with buildings.",
+  "frontend/src/pages/Profile.tsx": "Profile page displaying detailed user information including Principal ID, authentication method, account status, and user role with Turkish translations and role-specific descriptions using badges and card layouts.",
+  "frontend/src/components/Layout.tsx": "Layout wrapper component providing consistent navigation header, main content area, and footer with Caffeine.ai attribution across all authenticated pages.",
+  "frontend/src/components/Navigation.tsx": "Responsive navigation component with desktop and mobile views, displaying menu items for Panel, Ana Sayfa, Kullanıcılar, and Profil with logout functionality and active state highlighting.",
+  "frontend/src/index.css": "Global styles with OKLCH color system customized for building management theme using purple/indigo primary colors, supporting both light and dark modes.",
+  "frontend/tailwind.config.js": "Tailwind CSS configuration with Inter font family, extended color tokens using OKLCH values, and custom design system for the building management application.",
+  "frontend/src/pages/Users.tsx": "Users list page with placeholder implementation showing table structure for displaying user profiles including Principal ID, Name, Role column with Turkish translations, and First Login date using shadcn/ui Table components.",
+  "frontend/src/pages/UserDetail.tsx": "User detail page showing comprehensive user information including full Principal ID, first login timestamp, last login timestamp, and total login count with Turkish labels and back navigation.",
+  "frontend/src/hooks/useQueries.ts": "React Query hooks for all backend operations including user profiles, buildings, and invite code management with proper cache invalidation on mutations.",
+  "frontend/src/components/BuildingCreateForm.tsx": "Form component for creating a new building with validation, loading states, error handling, and success callbacks using shadcn/ui components and Turkish labels.",
+  "frontend/src/utils/roleTranslations.ts": "Utility module that maps backend Role enum values (binaSahibi, yetkili, sakin) to Turkish display strings and provides badge variant selection for consistent role display across the application.",
+  "frontend/src/components/InviteCodePanel.tsx": "Invite code management panel for BINA_SAHIBI users with role selection, code creation, copy-to-clipboard functionality, and table displaying all created codes with their status.",
+  "frontend/src/components/InviteCodeRegistration.tsx": "Invite code registration component with 16-character validation, authentication check, and form submission that redirects to home page on success."
+}

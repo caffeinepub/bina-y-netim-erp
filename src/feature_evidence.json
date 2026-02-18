@@ -1,0 +1,101 @@
+{
+  "kind": "feature_evidence_report",
+  "features": [
+    {
+      "featureId": "feature-remove-the-invite-code-registration-option-completely-from-the-login-page-frontend-src-pages-login-tsx-leaving-only-the-internet-identity-authentication-button",
+      "featureTitle": "Remove the invite code registration option completely from the Login page (frontend/src/pages/Login.tsx), leaving only the Internet Identity authentication button",
+      "files": [
+        "frontend/src/pages/Login.tsx"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "authorization@4.0.0"
+      ],
+      "testIds": [
+        "REQ-31"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-update-the-home-page-frontend-src-pages-home-tsx-to-conditionally-render-based-on-whether-the-user-is-associated-with-a-building-if-user-has-no-building-display-a-centered-onboarding-section-with-bina-olu-tur-create-building-button-and-davet-kodu-gir-enter-invite-code-input-field-with-submit-button-if-user-has-a-building-display-the-normal-role-based-panel-content",
+      "featureTitle": "Update the Home page (frontend/src/pages/Home.tsx) to conditionally render based on whether the user is associated with a building: if user has no building, display a centered onboarding section with 'Bina Oluştur' (Create Building) button and 'Davet Kodu Gir' (Enter Invite Code) input field with submit button; if user has a building, display the normal role-based panel content",
+      "files": [
+        "frontend/src/pages/Home.tsx"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "authorization@4.0.0"
+      ],
+      "testIds": [
+        "REQ-32"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-move-the-invitecoderegistration-component-functionality-from-the-login-page-to-the-home-page-onboarding-section-integrating-it-as-the-davet-kodu-gir-field-that-appears-for-users-without-a-building-assignment",
+      "featureTitle": "Move the InviteCodeRegistration component functionality from the Login page to the Home page onboarding section, integrating it as the 'Davet Kodu Gir' field that appears for users without a building assignment",
+      "files": [
+        "frontend/src/hooks/useQueries.ts",
+        "frontend/src/pages/Home.tsx"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "authorization@4.0.0"
+      ],
+      "testIds": [
+        "REQ-33"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-update-the-home-page-layout-to-ensure-the-onboarding-section-with-bina-olu-tur-and-davet-kodu-gir-is-visually-clear-and-welcoming-with-proper-spacing-card-based-design-consistent-with-existing-ui-patterns-and-clear-action-prompts-in-turkish",
+      "featureTitle": "Update the Home page layout to ensure the onboarding section (with 'Bina Oluştur' and 'Davet Kodu Gir') is visually clear and welcoming, with proper spacing, card-based design consistent with existing UI patterns, and clear action prompts in Turkish",
+      "files": [
+        "frontend/src/pages/Home.tsx"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "authorization@4.0.0"
+      ],
+      "testIds": [
+        "REQ-34"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-ensure-that-after-a-user-successfully-creates-a-building-via-the-bina-olu-tur-button-on-the-home-page-the-page-automatically-refreshes-or-updates-to-show-the-normal-role-based-panel-content-instead-of-the-onboarding-section",
+      "featureTitle": "Ensure that after a user successfully creates a building via the 'Bina Oluştur' button on the home page, the page automatically refreshes or updates to show the normal role-based panel content instead of the onboarding section",
+      "files": [
+        "frontend/src/hooks/useQueries.ts"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "authorization@4.0.0"
+      ],
+      "testIds": [
+        "REQ-35"
+      ],
+      "confidence": "high"
+    }
+  ]
+}

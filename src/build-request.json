@@ -1,0 +1,125 @@
+{
+  "kind": "build_request",
+  "title": "Restructure authentication flow to separate login from authorization",
+  "projectName": "Bina Yönetim",
+  "priority": "high",
+  "requirements": [
+    {
+      "id": "REQ-31",
+      "text": "Remove the invite code registration option completely from the Login page (frontend/src/pages/Login.tsx), leaving only the Internet Identity authentication button",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-20"
+        ],
+        "quotes": [
+          "Davet kodu ile giriş seçeneği tamamen kaldırılacak",
+          "Login sayfasından davet kodu ile giriş seçeneğini kaldır - sadece Internet Identity ile giriş kalacak"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Login page displays only Internet Identity authentication option",
+        "No invite code input field or registration form visible on login page",
+        "InviteCodeRegistration component is not rendered on login page"
+      ]
+    },
+    {
+      "id": "REQ-32",
+      "text": "Update the Home page (frontend/src/pages/Home.tsx) to conditionally render based on whether the user is associated with a building: if user has no building, display a centered onboarding section with 'Bina Oluştur' (Create Building) button and 'Davet Kodu Gir' (Enter Invite Code) input field with submit button; if user has a building, display the normal role-based panel content",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-20"
+        ],
+        "quotes": [
+          "Ana sayfada: 'Bina Oluştur' seçeneği, 'Davet Kodu Gir' alanı gösterilsin",
+          "Binaya bağlı olmayan kullanıcılar: Davet kodu ekranı görmeli, Binaya bağlı kullanıcılar: Normal panel görmeli"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Users without a building see a centered onboarding UI with both building creation and invite code entry options",
+        "Users with a building see the existing role-based dashboard content",
+        "The onboarding section includes clear Turkish labels and instructions",
+        "Building creation button opens the existing BuildingCreateForm component",
+        "Invite code input accepts 16-character codes and validates format before submission"
+      ]
+    },
+    {
+      "id": "REQ-33",
+      "text": "Move the InviteCodeRegistration component functionality from the Login page to the Home page onboarding section, integrating it as the 'Davet Kodu Gir' field that appears for users without a building assignment",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-20"
+        ],
+        "quotes": [
+          "Ana sayfada: 'Bina Oluştur' seçeneği, 'Davet Kodu Gir' alanı gösterilsin"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Invite code entry field appears on home page for users without buildings",
+        "Component validates 16-character code format before submission",
+        "Successful code entry assigns user to building and role, then refreshes home page to show normal panel",
+        "Error messages display in Turkish with appropriate feedback",
+        "After successful code usage, the onboarding section is replaced with the role-based panel"
+      ]
+    },
+    {
+      "id": "REQ-34",
+      "text": "Update the Home page layout to ensure the onboarding section (with 'Bina Oluştur' and 'Davet Kodu Gir') is visually clear and welcoming, with proper spacing, card-based design consistent with existing UI patterns, and clear action prompts in Turkish",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-20"
+        ],
+        "quotes": [
+          "Ana sayfada: 'Bina Oluştur' seçeneği, 'Davet Kodu Gir' alanı gösterilsin"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Onboarding section uses card-based layout consistent with Dashboard and Profile pages",
+        "Both options are clearly presented with proper visual hierarchy",
+        "Turkish text is clear and instructional",
+        "Responsive design works on mobile devices",
+        "Loading and error states are handled gracefully"
+      ]
+    },
+    {
+      "id": "REQ-35",
+      "text": "Ensure that after a user successfully creates a building via the 'Bina Oluştur' button on the home page, the page automatically refreshes or updates to show the normal role-based panel content instead of the onboarding section",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-20"
+        ],
+        "quotes": [
+          "Bina oluşturursa: Otomatik olarak BINA_SAHIBI rolü atanır, Davet kodu gerekmez"
+        ]
+      },
+      "acceptanceCriteria": [
+        "After building creation, user profile query is invalidated and refetched",
+        "Home page automatically displays the role-based panel after successful building creation",
+        "User sees their building information and InviteCodePanel (for BINA_SAHIBI role)",
+        "No manual page refresh required"
+      ]
+    }
+  ],
+  "constraints": [
+    "Do not modify the authentication mechanism itself - Internet Identity integration must remain unchanged",
+    "Preserve existing backend functions for invite code creation and usage",
+    "Maintain existing BuildingCreateForm and InviteCodePanel components without breaking changes",
+    "Keep all user interface text in Turkish",
+    "Do not change the role assignment logic in the backend"
+  ],
+  "nonGoals": [
+    "Adding new authentication methods beyond Internet Identity",
+    "Modifying the backend invite code data model or validation logic",
+    "Changing the three-role system (BINA_SAHIBI, YETKILI, SAKIN)",
+    "Implementing new ERP modules or features",
+    "Altering the Users list page or Profile page"
+  ],
+  "imageRequirements": {
+    "required": [],
+    "edits": []
+  }
+}

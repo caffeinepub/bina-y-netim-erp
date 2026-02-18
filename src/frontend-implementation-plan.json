@@ -1,0 +1,104 @@
+{
+  "kind": "implementation_plan",
+  "version": "1.0",
+  "title": "Restructure authentication flow to separate login from authorization",
+  "requirements": [
+    {
+      "id": "REQ-31",
+      "summary": "Remove invite code registration option from Login page, leaving only Internet Identity authentication",
+      "acceptanceCriteria": [
+        "Login page displays only Internet Identity authentication option",
+        "No invite code input field or registration form visible on login page",
+        "InviteCodeRegistration component is not rendered on login page"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/pages/Login.tsx",
+          "operation": "modify",
+          "description": "Remove the InviteCodeRegistration component import and its conditional rendering section. Keep only the Internet Identity login button and success redirect logic. Simplify the page to show only the authentication button with appropriate loading states."
+        }
+      ]
+    },
+    {
+      "id": "REQ-32",
+      "summary": "Update Home page to conditionally render onboarding section for users without buildings or role-based panel for users with buildings",
+      "acceptanceCriteria": [
+        "Users without a building see a centered onboarding UI with both building creation and invite code entry options",
+        "Users with a building see the existing role-based dashboard content",
+        "The onboarding section includes clear Turkish labels and instructions",
+        "Building creation button opens the existing BuildingCreateForm component",
+        "Invite code input accepts 16-character codes and validates format before submission"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/pages/Home.tsx",
+          "operation": "modify",
+          "description": "Add conditional rendering logic that checks if userProfile.binaId exists. If no building is assigned, render a centered onboarding section card containing: (1) a 'Bina Oluştur' button that toggles the BuildingCreateForm dialog, and (2) an invite code input section with a 16-character formatted text field and submit button labeled 'Davet Kodu Gir'. If building is assigned, render the existing building info and role-based content (InviteCodePanel for BINA_SAHIBI). Use card-based layout consistent with Dashboard and Profile pages. Handle loading and error states appropriately."
+        }
+      ]
+    },
+    {
+      "id": "REQ-33",
+      "summary": "Integrate invite code registration functionality into Home page onboarding section",
+      "acceptanceCriteria": [
+        "Invite code entry field appears on home page for users without buildings",
+        "Component validates 16-character code format before submission",
+        "Successful code entry assigns user to building and role, then refreshes home page to show normal panel",
+        "Error messages display in Turkish with appropriate feedback",
+        "After successful code usage, the onboarding section is replaced with the role-based panel"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/pages/Home.tsx",
+          "operation": "modify",
+          "description": "Within the onboarding section, add state management for the invite code input (16-character validation). Implement a submit handler that calls the useDavetKoduIleKayitOl mutation hook. On success, invalidate the userProfile query to trigger a refetch, which will cause the Home page to re-render and display the role-based panel instead of onboarding. Display error messages in Turkish using toast notifications. Include proper loading states during submission."
+        },
+        {
+          "path": "frontend/src/hooks/useQueries.ts",
+          "operation": "modify",
+          "description": "Ensure the useDavetKoduIleKayitOl mutation properly invalidates the ['currentUserProfile'] query key on success, triggering the Home page to refetch user data and update its conditional rendering. Verify error handling returns Turkish-friendly messages."
+        }
+      ]
+    },
+    {
+      "id": "REQ-34",
+      "summary": "Style onboarding section with card-based design and clear Turkish action prompts",
+      "acceptanceCriteria": [
+        "Onboarding section uses card-based layout consistent with Dashboard and Profile pages",
+        "Both options are clearly presented with proper visual hierarchy",
+        "Turkish text is clear and instructional",
+        "Responsive design works on mobile devices",
+        "Loading and error states are handled gracefully"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/pages/Home.tsx",
+          "operation": "modify",
+          "description": "Apply shadcn/ui Card components for the onboarding section with proper spacing using Tailwind classes. Use a centered flex or grid layout that stacks vertically on mobile. Add CardHeader with welcoming Turkish title (e.g., 'Hoş Geldiniz'), CardContent with two distinct sections: one for building creation and one for invite code entry. Use Button components with appropriate variants (primary for 'Bina Oluştur', secondary for invite code submit). Include proper loading spinners and disabled states. Ensure responsive breakpoints work correctly."
+        }
+      ]
+    },
+    {
+      "id": "REQ-35",
+      "summary": "Ensure Home page automatically updates to show role-based panel after successful building creation",
+      "acceptanceCriteria": [
+        "After building creation, user profile query is invalidated and refetched",
+        "Home page automatically displays the role-based panel after successful building creation",
+        "User sees their building information and InviteCodePanel (for BINA_SAHIBI role)",
+        "No manual page refresh required"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/hooks/useQueries.ts",
+          "operation": "modify",
+          "description": "In the useBinaOlustur mutation's onSuccess callback, ensure both ['currentUserProfile'] and ['kullaniciBinasi'] query keys are invalidated. This triggers the Home page to refetch the updated user profile (which now includes binaId and BINA_SAHIBI role) and building data, causing automatic re-render to show the role-based panel."
+        },
+        {
+          "path": "frontend/src/components/BuildingCreateForm.tsx",
+          "operation": "modify",
+          "description": "After successful building creation and before closing the dialog, ensure the parent component (Home page) receives notification to invalidate queries. Verify the form's onSuccess handler properly triggers query invalidation through the mutation hook. Consider adding a small delay before dialog close to allow query refetch to complete."
+        }
+      ]
+    }
+  ]
+}
