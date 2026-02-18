@@ -1,76 +1,46 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Home as HomeIcon, Building2, Users, Bell, Plus, KeyRound, Loader2 } from 'lucide-react';
-import { useGetUserBuilding, useGetCallerUserProfile, useRegisterWithInviteCode } from '@/hooks/useQueries';
+import { Home as HomeIcon, Building2, Users, Bell, Plus } from 'lucide-react';
+import { useGetUserBuilding, useGetCallerUserProfile } from '@/hooks/useQueries';
 import BuildingCreateForm from '@/components/BuildingCreateForm';
 import InviteCodePanel from '@/components/InviteCodePanel';
+import InviteCodeRegistration from '@/components/InviteCodeRegistration';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import { getRoleDisplayName, getRoleVariant } from '@/utils/roleTranslations';
 import { Role } from '@/backend';
-import { toast } from 'sonner';
+import { getOnboardingFlow, clearOnboardingFlow } from '@/utils/urlParams';
 
 export default function Home() {
   const [showCreateForm, setShowCreateForm] = useState(false);
-  const [inviteCode, setInviteCode] = useState('');
-  const [validationError, setValidationError] = useState<string | null>(null);
+  const [onboardingMode, setOnboardingMode] = useState<'building-owner' | 'authority' | 'resident' | null>(null);
   
   const { data: building, isLoading: buildingLoading, isFetched: buildingFetched, error: buildingError } = useGetUserBuilding();
   const { data: userProfile, isLoading: profileLoading, isFetched: profileFetched } = useGetCallerUserProfile();
-  const registerMutation = useRegisterWithInviteCode();
 
   const hasBuilding = userProfile?.binaId !== null && userProfile?.binaId !== undefined;
   const userRole = userProfile?.role;
   const isBinaSahibi = userRole === Role.binaSahibi;
 
+  // Check for onboarding flow on mount
+  useEffect(() => {
+    if (profileFetched && !hasBuilding) {
+      const flow = getOnboardingFlow();
+      if (flow === 'building-owner' || flow === 'authority' || flow === 'resident') {
+        setOnboardingMode(flow);
+        clearOnboardingFlow();
+      }
+    }
+  }, [profileFetched, hasBuilding]);
+
   const handleCreateSuccess = () => {
     setShowCreateForm(false);
+    setOnboardingMode(null);
   };
 
-  const validateCode = (value: string): boolean => {
-    setValidationError(null);
-    
-    if (value.length === 0) {
-      return true;
-    }
-
-    if (value.length !== 16) {
-      setValidationError('Davet kodu 16 haneli olmalıdır');
-      return false;
-    }
-
-    if (!/^[A-Za-z0-9]+$/.test(value)) {
-      setValidationError('Sadece harf ve rakam kullanılabilir');
-      return false;
-    }
-
-    return true;
-  };
-
-  const handleCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value.toUpperCase();
-    setInviteCode(value);
-    validateCode(value);
-  };
-
-  const handleInviteCodeSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!validateCode(inviteCode) || inviteCode.length !== 16) {
-      return;
-    }
-
-    try {
-      await registerMutation.mutateAsync(inviteCode);
-      toast.success('Davet kodu başarıyla kullanıldı!');
-      setInviteCode('');
-    } catch (error: any) {
-      const errorMessage = error.message || 'Davet kodu kullanılırken bir hata oluştu';
-      toast.error(errorMessage);
-    }
+  const handleInviteCodeSuccess = () => {
+    setOnboardingMode(null);
   };
 
   // Role-based conditional rendering infrastructure
@@ -115,6 +85,77 @@ export default function Home() {
 
   // Onboarding section for users without buildings
   const renderOnboardingSection = () => {
+    // If onboarding mode is set, show the specific flow
+    if (onboardingMode === 'building-owner') {
+      return (
+        <div className="max-w-2xl mx-auto space-y-6">
+          <Card className="shadow-lg">
+            <CardHeader className="text-center">
+              <div className="mx-auto w-16 h-16 bg-blue-500/10 rounded-2xl flex items-center justify-center mb-4">
+                <Building2 className="w-10 h-10 text-blue-600" />
+              </div>
+              <CardTitle className="text-2xl">Bina Oluştur</CardTitle>
+              <CardDescription>
+                Yeni bir bina oluşturun ve yönetmeye başlayın
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <BuildingCreateForm onSuccess={handleCreateSuccess} />
+            </CardContent>
+          </Card>
+        </div>
+      );
+    }
+
+    if (onboardingMode === 'authority') {
+      return (
+        <div className="max-w-2xl mx-auto space-y-6">
+          <Card className="shadow-lg">
+            <CardHeader className="text-center">
+              <div className="mx-auto w-16 h-16 bg-purple-500/10 rounded-2xl flex items-center justify-center mb-4">
+                <Users className="w-10 h-10 text-purple-600" />
+              </div>
+              <CardTitle className="text-2xl">Yetkili Olarak Katıl</CardTitle>
+              <CardDescription>
+                Davet kodunuzu girerek yetkili olarak binaya katılın
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <InviteCodeRegistration 
+                suggestedRole={Role.yetkili}
+                onSuccess={handleInviteCodeSuccess}
+              />
+            </CardContent>
+          </Card>
+        </div>
+      );
+    }
+
+    if (onboardingMode === 'resident') {
+      return (
+        <div className="max-w-2xl mx-auto space-y-6">
+          <Card className="shadow-lg">
+            <CardHeader className="text-center">
+              <div className="mx-auto w-16 h-16 bg-green-500/10 rounded-2xl flex items-center justify-center mb-4">
+                <Users className="w-10 h-10 text-green-600" />
+              </div>
+              <CardTitle className="text-2xl">Sakin/Personel Olarak Katıl</CardTitle>
+              <CardDescription>
+                Davet kodunuzu girerek binaya katılın
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <InviteCodeRegistration 
+                suggestedRole={Role.sakin}
+                onSuccess={handleInviteCodeSuccess}
+              />
+            </CardContent>
+          </Card>
+        </div>
+      );
+    }
+
+    // Default onboarding view (no specific flow selected)
     return (
       <div className="max-w-2xl mx-auto space-y-6">
         <Card className="shadow-lg">
@@ -167,7 +208,7 @@ export default function Home() {
             <div className="space-y-4">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-secondary/10 rounded-lg flex items-center justify-center">
-                  <KeyRound className="w-5 h-5 text-secondary" />
+                  <Users className="w-5 h-5 text-secondary" />
                 </div>
                 <div>
                   <h3 className="font-semibold">Davet Kodu ile Katıl</h3>
@@ -177,44 +218,7 @@ export default function Home() {
                 </div>
               </div>
 
-              <form onSubmit={handleInviteCodeSubmit} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="inviteCode">Davet Kodu (16 haneli)</Label>
-                  <Input
-                    id="inviteCode"
-                    type="text"
-                    placeholder="XXXXXXXXXXXXXXXX"
-                    value={inviteCode}
-                    onChange={handleCodeChange}
-                    maxLength={16}
-                    className="font-mono text-center text-lg tracking-wider"
-                    disabled={registerMutation.isPending}
-                  />
-                  {validationError && (
-                    <p className="text-sm text-destructive">{validationError}</p>
-                  )}
-                </div>
-
-                <Button
-                  type="submit"
-                  className="w-full"
-                  size="lg"
-                  variant="secondary"
-                  disabled={registerMutation.isPending || inviteCode.length !== 16 || !!validationError}
-                >
-                  {registerMutation.isPending ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Kaydediliyor...
-                    </>
-                  ) : (
-                    <>
-                      <KeyRound className="mr-2 h-4 w-4" />
-                      Davet Kodunu Kullan
-                    </>
-                  )}
-                </Button>
-              </form>
+              <InviteCodeRegistration onSuccess={handleInviteCodeSuccess} />
             </div>
           </CardContent>
         </Card>

@@ -1,18 +1,17 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-18T21:38:12.821Z",
-  "summary": "The diff shows successful implementation of all requirements. The authentication flow has been restructured to separate login from authorization: Login.tsx now shows only Internet Identity authentication, Home.tsx implements conditional rendering with onboarding section for users without buildings (containing both building creation and invite code entry), InviteCodeRegistration functionality has been integrated into the Home page onboarding, and proper query invalidation ensures automatic UI updates after building creation or invite code usage.",
+  "generatedAt": "2026-02-18T22:07:25.380Z",
+  "summary": "The implementation successfully addresses all four requirements (REQ-36, REQ-37, REQ-38, REQ-39). The Login.tsx file shows three distinct onboarding cards displayed simultaneously with Turkish labels, role-specific icons, descriptions, and styled Internet Identity buttons. The flow selection mechanism stores the onboarding type before authentication using sessionStorage. Post-login routing logic in Home.tsx reads the stored flow and displays appropriate UI (building creation for owners, invite code entry with role context for authority/resident). All cards include visual icons, Turkish titles, descriptions, and properly styled buttons. The implementation appears complete and well-structured.",
   "missing_requirements": [],
   "hallucinated_features": [],
-  "confidence": 0.95,
+  "confidence": 0.92,
   "changed_files": [
     "frontend-file-summaries.txt",
-    "frontend/src/components/InviteCodePanel.tsx",
     "frontend/src/components/InviteCodeRegistration.tsx",
-    "frontend/src/hooks/useQueries.ts",
     "frontend/src/pages/Home.tsx",
     "frontend/src/pages/Login.tsx",
+    "frontend/src/utils/urlParams.ts",
     "project_state.json"
   ]
 }

@@ -1,14 +1,14 @@
 # Specification
 
 ## Summary
-**Goal:** Restructure authentication flow to separate login from authorization by moving invite code registration from the Login page to the Home page.
+**Goal:** Redesign the login screen to display three separate onboarding cards simultaneously for different user types (Building Owner, Authority, Resident).
 
 **Planned changes:**
-- Remove invite code registration option completely from Login page, leaving only Internet Identity authentication
-- Update Home page to conditionally render based on user's building association
-- Display onboarding section with 'Bina Oluştur' (Create Building) button and 'Davet Kodu Gir' (Enter Invite Code) input for users without a building
-- Display normal role-based panel content for users with a building
-- Move InviteCodeRegistration component functionality to Home page onboarding section
-- Ensure Home page automatically updates to show role-based panel after successful building creation or invite code usage
+- Display three distinct onboarding cards side-by-side on the login screen, each targeting a specific user type (Building Owner, Authority, Resident/Staff)
+- Each card includes a visual icon, Turkish title, description, and its own Internet Identity login button
+- Implement responsive layout that arranges cards horizontally on desktop and vertically on mobile
+- Store the selected onboarding flow type when a user clicks an Internet Identity button within a card
+- Update post-login routing to direct users to the appropriate flow: Building Owner to building creation form, Authority to invite code entry for YETKILI role, Resident to invite code entry for SAKIN role
+- Design each card with clear visual hierarchy using icons, role-specific styling, and consistent shadcn/ui patterns
 
-**User-visible outcome:** Users authenticate with Internet Identity on the Login page, then see an onboarding section on the Home page if they don't have a building assignment. They can either create a new building or enter an invite code to join an existing one. Once assigned to a building, they see the normal role-based dashboard.
+**User-visible outcome:** Users see three onboarding options on the login screen and can choose their role before authenticating, leading to a tailored post-login experience based on their selection.

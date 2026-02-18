@@ -1,102 +1,85 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Restructure authentication flow to separate login from authorization",
+  "title": "Redesign login screen with three separate onboarding cards displayed simultaneously",
   "requirements": [
     {
-      "id": "REQ-31",
-      "summary": "Remove invite code registration option from Login page, leaving only Internet Identity authentication",
+      "id": "REQ-36",
+      "summary": "Redesign Login page to display three distinct onboarding cards simultaneously for Building Owner, Authority (YETKILI), and Resident/Staff (SAKIN) user types with Turkish labels and responsive layout",
       "acceptanceCriteria": [
-        "Login page displays only Internet Identity authentication option",
-        "No invite code input field or registration form visible on login page",
-        "InviteCodeRegistration component is not rendered on login page"
+        "Three separate cards/panels are visible simultaneously on the login screen",
+        "Each card is clearly labeled in Turkish indicating its intended user type (Bina Sahibi, Yetkili, Sakin/Personel)",
+        "Cards are displayed in a responsive grid layout that works on both desktop and mobile devices",
+        "Each card contains its own Internet Identity login button",
+        "The layout is horizontally arranged on desktop (3 columns) and stacks vertically on mobile"
       ],
       "file_operations": [
         {
           "path": "frontend/src/pages/Login.tsx",
           "operation": "modify",
-          "description": "Remove the InviteCodeRegistration component import and its conditional rendering section. Keep only the Internet Identity login button and success redirect logic. Simplify the page to show only the authentication button with appropriate loading states."
+          "description": "Replace the current single-login interface with a three-card layout using a responsive grid (grid-cols-1 md:grid-cols-3). Each card displays: (1) Building Owner card with 'Bina Sahibi' title and 'Bina Oluştur' description, (2) Authority card with 'Yetkili' title and 'Davet Kodu Gir' description for YETKILI role, (3) Resident/Staff card with 'Sakin/Personel' title and 'Davet Kodu Gir' description for SAKIN role. Use shadcn/ui Card components with consistent spacing. Wire the generated icon images from frontend/public/assets/generated/building-owner-icon.dim_128x128.png, frontend/public/assets/generated/authority-icon.dim_128x128.png, and frontend/public/assets/generated/resident-icon.dim_128x128.png as visual identifiers for each card. Each card includes its own Internet Identity login button."
         }
       ]
     },
     {
-      "id": "REQ-32",
-      "summary": "Update Home page to conditionally render onboarding section for users without buildings or role-based panel for users with buildings",
+      "id": "REQ-37",
+      "summary": "Implement onboarding flow selection mechanism that stores the selected flow type (building-owner, authority, or resident) before initiating authentication",
       "acceptanceCriteria": [
-        "Users without a building see a centered onboarding UI with both building creation and invite code entry options",
-        "Users with a building see the existing role-based dashboard content",
-        "The onboarding section includes clear Turkish labels and instructions",
-        "Building creation button opens the existing BuildingCreateForm component",
-        "Invite code input accepts 16-character codes and validates format before submission"
+        "Each card's Internet Identity button stores the selected onboarding flow type before authentication",
+        "The selected flow persists through the authentication process",
+        "After successful authentication, users are redirected to the appropriate post-login experience based on their selected flow"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/pages/Home.tsx",
+          "path": "frontend/src/pages/Login.tsx",
           "operation": "modify",
-          "description": "Add conditional rendering logic that checks if userProfile.binaId exists. If no building is assigned, render a centered onboarding section card containing: (1) a 'Bina Oluştur' button that toggles the BuildingCreateForm dialog, and (2) an invite code input section with a 16-character formatted text field and submit button labeled 'Davet Kodu Gir'. If building is assigned, render the existing building info and role-based content (InviteCodePanel for BINA_SAHIBI). Use card-based layout consistent with Dashboard and Profile pages. Handle loading and error states appropriately."
-        }
-      ]
-    },
-    {
-      "id": "REQ-33",
-      "summary": "Integrate invite code registration functionality into Home page onboarding section",
-      "acceptanceCriteria": [
-        "Invite code entry field appears on home page for users without buildings",
-        "Component validates 16-character code format before submission",
-        "Successful code entry assigns user to building and role, then refreshes home page to show normal panel",
-        "Error messages display in Turkish with appropriate feedback",
-        "After successful code usage, the onboarding section is replaced with the role-based panel"
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/pages/Home.tsx",
-          "operation": "modify",
-          "description": "Within the onboarding section, add state management for the invite code input (16-character validation). Implement a submit handler that calls the useDavetKoduIleKayitOl mutation hook. On success, invalidate the userProfile query to trigger a refetch, which will cause the Home page to re-render and display the role-based panel instead of onboarding. Display error messages in Turkish using toast notifications. Include proper loading states during submission."
+          "description": "Add click handlers to each card's Internet Identity button that store the selected onboarding flow type ('building-owner', 'authority', or 'resident') in sessionStorage before calling the login() function from useInternetIdentity hook. Use the key 'onboardingFlow' for storage. Ensure the flow type persists through the authentication redirect."
         },
         {
-          "path": "frontend/src/hooks/useQueries.ts",
+          "path": "frontend/src/utils/urlParams.ts",
           "operation": "modify",
-          "description": "Ensure the useDavetKoduIleKayitOl mutation properly invalidates the ['currentUserProfile'] query key on success, triggering the Home page to refetch user data and update its conditional rendering. Verify error handling returns Turkish-friendly messages."
+          "description": "Add helper functions getOnboardingFlow() and clearOnboardingFlow() to retrieve and clear the 'onboardingFlow' value from sessionStorage, following the existing pattern of URL parameter management utilities."
         }
       ]
     },
     {
-      "id": "REQ-34",
-      "summary": "Style onboarding section with card-based design and clear Turkish action prompts",
+      "id": "REQ-38",
+      "summary": "Update post-login routing logic to handle three onboarding flows: Building Owner to building creation, Authority to invite code entry with YETKILI context, Resident to invite code entry with SAKIN context",
       "acceptanceCriteria": [
-        "Onboarding section uses card-based layout consistent with Dashboard and Profile pages",
-        "Both options are clearly presented with proper visual hierarchy",
-        "Turkish text is clear and instructional",
-        "Responsive design works on mobile devices",
-        "Loading and error states are handled gracefully"
+        "Users selecting Building Owner flow are shown the building creation interface after authentication",
+        "Users selecting Authority flow are shown invite code entry with YETKILI role context",
+        "Users selecting Resident flow are shown invite code entry with SAKIN role context",
+        "The routing respects existing authentication and building association checks",
+        "Users already associated with a building are redirected to their normal home page regardless of selected flow"
       ],
       "file_operations": [
         {
           "path": "frontend/src/pages/Home.tsx",
           "operation": "modify",
-          "description": "Apply shadcn/ui Card components for the onboarding section with proper spacing using Tailwind classes. Use a centered flex or grid layout that stacks vertically on mobile. Add CardHeader with welcoming Turkish title (e.g., 'Hoş Geldiniz'), CardContent with two distinct sections: one for building creation and one for invite code entry. Use Button components with appropriate variants (primary for 'Bina Oluştur', secondary for invite code submit). Include proper loading spinners and disabled states. Ensure responsive breakpoints work correctly."
+          "description": "Add logic at component mount to check for stored onboardingFlow in sessionStorage using getOnboardingFlow(). If a flow is present and the user has no building association (kullaniciBinasi is null), display the appropriate UI: 'building-owner' shows BuildingCreateForm, 'authority' or 'resident' shows InviteCodeRegistration with the corresponding role context (YETKILI or SAKIN). Clear the onboardingFlow after reading it using clearOnboardingFlow(). If the user already has a building association, ignore the onboardingFlow and show the normal home page content."
+        },
+        {
+          "path": "frontend/src/components/InviteCodeRegistration.tsx",
+          "operation": "modify",
+          "description": "Add an optional prop 'suggestedRole' of type Role that pre-populates or locks the role selection based on the onboarding flow context (YETKILI for authority flow, SAKIN for resident flow). Update the component to display role-specific messaging in Turkish when a suggestedRole is provided."
         }
       ]
     },
     {
-      "id": "REQ-35",
-      "summary": "Ensure Home page automatically updates to show role-based panel after successful building creation",
+      "id": "REQ-39",
+      "summary": "Design each onboarding card with clear visual hierarchy including icon, Turkish title, description, and role-specific Internet Identity button styling",
       "acceptanceCriteria": [
-        "After building creation, user profile query is invalidated and refetched",
-        "Home page automatically displays the role-based panel after successful building creation",
-        "User sees their building information and InviteCodePanel (for BINA_SAHIBI role)",
-        "No manual page refresh required"
+        "Each card includes a visual icon or illustration distinguishing the user type",
+        "Card titles clearly identify the user type in Turkish (Bina Sahibi, Yetkili, Sakin/Personel)",
+        "Each card includes a 2-3 sentence description in Turkish explaining that user type's role",
+        "Internet Identity buttons are visually distinct for each card using color coding or styling",
+        "Cards use consistent spacing and styling aligned with existing shadcn/ui component patterns"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/hooks/useQueries.ts",
+          "path": "frontend/src/pages/Login.tsx",
           "operation": "modify",
-          "description": "In the useBinaOlustur mutation's onSuccess callback, ensure both ['currentUserProfile'] and ['kullaniciBinasi'] query keys are invalidated. This triggers the Home page to refetch the updated user profile (which now includes binaId and BINA_SAHIBI role) and building data, causing automatic re-render to show the role-based panel."
-        },
-        {
-          "path": "frontend/src/components/BuildingCreateForm.tsx",
-          "operation": "modify",
-          "description": "After successful building creation and before closing the dialog, ensure the parent component (Home page) receives notification to invalidate queries. Verify the form's onSuccess handler properly triggers query invalidation through the mutation hook. Consider adding a small delay before dialog close to allow query refetch to complete."
+          "description": "Style each onboarding card using shadcn/ui Card, CardHeader, CardTitle, CardDescription, and CardContent components. Include the generated icon images (building-owner-icon.dim_128x128.png, authority-icon.dim_128x128.png, resident-icon.dim_128x128.png) at the top of each card with consistent sizing (w-32 h-32). Add Turkish titles: 'Bina Sahibi' (Building Owner), 'Yetkili' (Authority), 'Sakin/Personel' (Resident/Staff). Include 2-3 sentence Turkish descriptions explaining each role's purpose. Style Internet Identity buttons with role-specific colors using Tailwind classes: blue variant for Building Owner, purple variant for Authority, green variant for Resident. Ensure cards use consistent padding, gap spacing, and follow existing shadcn/ui patterns from the project."
         }
       ]
     }

@@ -206,3 +206,21 @@ export function getSecretFromHash(paramName: string): string | null {
 export function getSecretParameter(paramName: string): string | null {
     return getSecretFromHash(paramName);
 }
+
+/**
+ * Gets the onboarding flow type from sessionStorage
+ * Used to determine which onboarding experience to show after authentication
+ *
+ * @returns The onboarding flow type ('building-owner', 'authority', or 'resident') if found, null otherwise
+ */
+export function getOnboardingFlow(): string | null {
+    return getSessionParameter('onboardingFlow');
+}
+
+/**
+ * Clears the onboarding flow from sessionStorage
+ * Should be called after the onboarding flow has been processed
+ */
+export function clearOnboardingFlow(): void {
+    clearSessionParameter('onboardingFlow');
+}

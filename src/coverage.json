@@ -1,18 +1,18 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-18T21:38:12.824Z",
+  "generatedAt": "2026-02-18T22:07:25.383Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 5,
-    "implemented": 5,
+    "total": 4,
+    "implemented": 4,
     "items": [
       {
-        "id": "REQ-31",
-        "summary": "Remove the invite code registration option completely from the Login page (frontend/src/pages/Login.tsx), leaving only the Internet Identity authentication button",
+        "id": "REQ-36",
+        "summary": "Redesign the Login page (frontend/src/pages/Login.tsx) to display three distinct onboarding cards/panels simultaneously on the same screen: (1) Building Owner card with 'Bina Oluştur' (Create Building) option, (2) Authority card with 'Davet Kodu Gir' (Enter Invite Code) option for YETKILI role, and (3) Resident/Staff card with 'Davet Kodu Gir' (Enter Invite Code) option for SAKIN role",
         "status": "implemented",
         "plannedFiles": [
           "frontend/src/pages/Login.tsx"
@@ -22,50 +22,40 @@
         ]
       },
       {
-        "id": "REQ-32",
-        "summary": "Update the Home page (frontend/src/pages/Home.tsx) to conditionally render based on whether the user is associated with a building: if user has no building, display a centered onboarding section with 'Bina Oluştur' (Create Building) button and 'Davet Kodu Gir' (Enter Invite Code) input field with submit button; if user has a building, display the normal role-based panel content",
+        "id": "REQ-37",
+        "summary": "Implement onboarding flow selection mechanism where clicking the Internet Identity button within each card stores the selected flow type (building-owner, authority, or resident) in session storage or state before initiating authentication",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/pages/Home.tsx"
+          "frontend/src/pages/Login.tsx",
+          "frontend/src/utils/urlParams.ts"
         ],
         "matchedFiles": [
-          "frontend/src/pages/Home.tsx"
+          "frontend/src/pages/Login.tsx",
+          "frontend/src/utils/urlParams.ts"
         ]
       },
       {
-        "id": "REQ-33",
-        "summary": "Move the InviteCodeRegistration component functionality from the Login page to the Home page onboarding section, integrating it as the 'Davet Kodu Gir' field that appears for users without a building assignment",
+        "id": "REQ-38",
+        "summary": "Update the post-login routing logic to handle the three onboarding flows: (1) Building Owner flow redirects to building creation form, (2) Authority flow redirects to invite code entry for YETKILI role, (3) Resident flow redirects to invite code entry for SAKIN role",
         "status": "implemented",
         "plannedFiles": [
           "frontend/src/pages/Home.tsx",
-          "frontend/src/hooks/useQueries.ts"
+          "frontend/src/components/InviteCodeRegistration.tsx"
         ],
         "matchedFiles": [
           "frontend/src/pages/Home.tsx",
-          "frontend/src/hooks/useQueries.ts"
+          "frontend/src/components/InviteCodeRegistration.tsx"
         ]
       },
       {
-        "id": "REQ-34",
-        "summary": "Update the Home page layout to ensure the onboarding section (with 'Bina Oluştur' and 'Davet Kodu Gir') is visually clear and welcoming, with proper spacing, card-based design consistent with existing UI patterns, and clear action prompts in Turkish",
+        "id": "REQ-39",
+        "summary": "Design each onboarding card with a clear visual hierarchy including an icon or illustration representing the user type, a title in Turkish, a brief description of that user type's purpose, and a prominent Internet Identity login button with role-specific styling",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/pages/Home.tsx"
+          "frontend/src/pages/Login.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/pages/Home.tsx"
-        ]
-      },
-      {
-        "id": "REQ-35",
-        "summary": "Ensure that after a user successfully creates a building via the 'Bina Oluştur' button on the home page, the page automatically refreshes or updates to show the normal role-based panel content instead of the onboarding section",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/hooks/useQueries.ts",
-          "frontend/src/components/BuildingCreateForm.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/hooks/useQueries.ts"
+          "frontend/src/pages/Login.tsx"
         ]
       }
     ]
@@ -75,11 +65,13 @@
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/components/InviteCodePanel.tsx",
+    "frontend/public/assets/generated/authority-icon.dim_128x128.png",
+    "frontend/public/assets/generated/building-owner-icon.dim_128x128.png",
+    "frontend/public/assets/generated/resident-icon.dim_128x128.png",
     "frontend/src/components/InviteCodeRegistration.tsx",
-    "frontend/src/hooks/useQueries.ts",
     "frontend/src/pages/Home.tsx",
     "frontend/src/pages/Login.tsx",
+    "frontend/src/utils/urlParams.ts",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

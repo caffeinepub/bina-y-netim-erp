@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 13,
-  "summary": "Bina Yönetim ERP Uygulaması - Multi-tenant, rol bazlı bina yönetim sistemi. Internet Identity tek kimlik doğrulama yöntemi. Davet kodu giriş yöntemi değil, rol ve bina eşleştirme aracıdır. Kullanıcılar Internet Identity ile giriş yapar, binaya bağlı değilse davet kodu girer veya bina oluşturur. Onboarding akışı: Bina Sahibi (bina oluşturma), Yetkili (davet kodu), Sakin/Personel (davet kodu).",
+  "projectStateVersion": 15,
+  "summary": "Bina Yönetim ERP Uygulaması - Multi-tenant, rol bazlı bina yönetim sistemi. Internet Identity tek kimlik doğrulama yöntemi. Davet kodu giriş yöntemi değil, rol ve bina eşleştirme aracıdır. Kullanıcılar Internet Identity ile giriş yapar, binaya bağlı değilse davet kodu girer veya bina oluşturur. Onboarding akışı: Bina Sahibi (bina oluşturma), Yetkili (davet kodu), Sakin/Personel (davet kodu). Login ekranında 3 farklı onboarding akışı seçeneği aynı anda gösterilecek.",
   "architectural_notes": [
     "Internet Identity tek kimlik doğrulama yöntemi",
     "3 seviyeli hiyerarşi: Bina Hesabı → Bina Yetkilisi → Daire Sakini/Personel",
@@ -16,6 +16,7 @@
   ],
   "known_issues": [],
   "isFixRequest": false,
+  "imageRequirements": "## Required Images\n- Building owner icon illustration showing a person with keys or building symbol (building-owner-icon.dim_128x128.png)\n- Authority figure icon illustration showing a professional or manager (authority-icon.dim_128x128.png)\n- Resident icon illustration showing a person or home symbol (resident-icon.dim_128x128.png)",
   "existing_features": [
     {
       "id": "feature-implement-internet-identity-authentication-system-that-allows-users-to-log-in-using-their-internet-identity-principal",
@@ -174,6 +175,38 @@
       "title": "Ensure that after a user successfully creates a building via the 'Bina Oluştur' button on the home page, the page automatically refreshes or updates to show the normal role-based panel content instead of the onboarding section",
       "reqIds": [
         "REQ-35"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-redesign-the-login-page-frontend-src-pages-login-tsx-to-display-three-distinct-onboarding-cards-panels-simultaneously-on-the-same-screen-1-building-owner-card-with-bina-olu-tur-create-building-option-2-authority-card-with-davet-kodu-gir-enter-invite-code-option-for-yetkili-role-and-3-resident-staff-card-with-davet-kodu-gir-enter-invite-code-option-for-sakin-role",
+      "title": "Redesign the Login page (frontend/src/pages/Login.tsx) to display three distinct onboarding cards/panels simultaneously on the same screen: (1) Building Owner card with 'Bina Oluştur' (Create Building) option, (2) Authority card with 'Davet Kodu Gir' (Enter Invite Code) option for YETKILI role, and (3) Resident/Staff card with 'Davet Kodu Gir' (Enter Invite Code) option for SAKIN role",
+      "reqIds": [
+        "REQ-36"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-onboarding-flow-selection-mechanism-where-clicking-the-internet-identity-button-within-each-card-stores-the-selected-flow-type-building-owner-authority-or-resident-in-session-storage-or-state-before-initiating-authentication",
+      "title": "Implement onboarding flow selection mechanism where clicking the Internet Identity button within each card stores the selected flow type (building-owner, authority, or resident) in session storage or state before initiating authentication",
+      "reqIds": [
+        "REQ-37"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-post-login-routing-logic-to-handle-the-three-onboarding-flows-1-building-owner-flow-redirects-to-building-creation-form-2-authority-flow-redirects-to-invite-code-entry-for-yetkili-role-3-resident-flow-redirects-to-invite-code-entry-for-sakin-role",
+      "title": "Update the post-login routing logic to handle the three onboarding flows: (1) Building Owner flow redirects to building creation form, (2) Authority flow redirects to invite code entry for YETKILI role, (3) Resident flow redirects to invite code entry for SAKIN role",
+      "reqIds": [
+        "REQ-38"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-design-each-onboarding-card-with-a-clear-visual-hierarchy-including-an-icon-or-illustration-representing-the-user-type-a-title-in-turkish-a-brief-description-of-that-user-type-s-purpose-and-a-prominent-internet-identity-login-button-with-role-specific-styling",
+      "title": "Design each onboarding card with a clear visual hierarchy including an icon or illustration representing the user type, a title in Turkish, a brief description of that user type's purpose, and a prominent Internet Identity login button with role-specific styling",
+      "reqIds": [
+        "REQ-39"
       ],
       "version": 1
     }
@@ -338,6 +371,12 @@
     {
       "id": "AR-44",
       "summary": "Ana sayfada binaya bağlı olmayan kullanıcılar için 'Bina Oluştur' ve 'Davet Kodu Gir' seçeneklerini göster, binaya bağlı kullanıcılar için normal panel göster",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-45",
+      "summary": "Login ekranını 3 farklı onboarding penceresi/kartı içerecek şekilde yeniden tasarla: (1) Bina Sahibi - Bina Oluştur, (2) Yetkili - Davet Kodu Gir, (3) Sakin/Personel - Davet Kodu Gir. Her kart ayrı Internet Identity giriş butonu içerecek ve seçilen akışa göre yönlendirecek.",
       "reqIds": [],
       "status": "pending"
     }
