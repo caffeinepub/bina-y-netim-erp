@@ -208,18 +208,31 @@ export function getSecretParameter(paramName: string): string | null {
 }
 
 /**
- * Gets the onboarding flow type from sessionStorage
- * Used to determine which onboarding experience to show after authentication
+ * Stores the onboarding flow type in sessionStorage
+ * Used to persist the user's selected onboarding path across navigation
  *
- * @returns The onboarding flow type ('building-owner', 'authority', or 'resident') if found, null otherwise
+ * @param flow - The onboarding flow type ('building-owner', 'authority', or 'resident')
  */
-export function getOnboardingFlow(): string | null {
-    return getSessionParameter('onboardingFlow');
+export function storeOnboardingFlow(flow: 'building-owner' | 'authority' | 'resident'): void {
+    storeSessionParameter('onboardingFlow', flow);
+}
+
+/**
+ * Retrieves the stored onboarding flow from sessionStorage
+ *
+ * @returns The onboarding flow type if found, null otherwise
+ */
+export function getOnboardingFlow(): 'building-owner' | 'authority' | 'resident' | null {
+    const flow = getSessionParameter('onboardingFlow');
+    if (flow === 'building-owner' || flow === 'authority' || flow === 'resident') {
+        return flow;
+    }
+    return null;
 }
 
 /**
  * Clears the onboarding flow from sessionStorage
- * Should be called after the onboarding flow has been processed
+ * Should be called after the onboarding process is complete
  */
 export function clearOnboardingFlow(): void {
     clearSessionParameter('onboardingFlow');

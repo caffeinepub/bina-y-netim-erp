@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 15,
+  "projectStateVersion": 17,
   "summary": "Bina Yönetim ERP Uygulaması - Multi-tenant, rol bazlı bina yönetim sistemi. Internet Identity tek kimlik doğrulama yöntemi. Davet kodu giriş yöntemi değil, rol ve bina eşleştirme aracıdır. Kullanıcılar Internet Identity ile giriş yapar, binaya bağlı değilse davet kodu girer veya bina oluşturur. Onboarding akışı: Bina Sahibi (bina oluşturma), Yetkili (davet kodu), Sakin/Personel (davet kodu). Login ekranında 3 farklı onboarding akışı seçeneği aynı anda gösterilecek.",
   "architectural_notes": [
     "Internet Identity tek kimlik doğrulama yöntemi",
@@ -16,7 +16,6 @@
   ],
   "known_issues": [],
   "isFixRequest": false,
-  "imageRequirements": "## Required Images\n- Building owner icon illustration showing a person with keys or building symbol (building-owner-icon.dim_128x128.png)\n- Authority figure icon illustration showing a professional or manager (authority-icon.dim_128x128.png)\n- Resident icon illustration showing a person or home symbol (resident-icon.dim_128x128.png)",
   "existing_features": [
     {
       "id": "feature-implement-internet-identity-authentication-system-that-allows-users-to-log-in-using-their-internet-identity-principal",
@@ -371,12 +370,6 @@
     {
       "id": "AR-44",
       "summary": "Ana sayfada binaya bağlı olmayan kullanıcılar için 'Bina Oluştur' ve 'Davet Kodu Gir' seçeneklerini göster, binaya bağlı kullanıcılar için normal panel göster",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-45",
-      "summary": "Login ekranını 3 farklı onboarding penceresi/kartı içerecek şekilde yeniden tasarla: (1) Bina Sahibi - Bina Oluştur, (2) Yetkili - Davet Kodu Gir, (3) Sakin/Personel - Davet Kodu Gir. Her kart ayrı Internet Identity giriş butonu içerecek ve seçilen akışa göre yönlendirecek.",
       "reqIds": [],
       "status": "pending"
     }

@@ -1,11 +1,11 @@
 {
-  "frontend/src/App.tsx": "Main application component with TanStack Router configuration, authentication context, and protected route handling for dashboard, home, profile, and users pages.",
+  "frontend/src/App.tsx": "Main application component with TanStack Router configuration, authentication context, and protected route handling for all pages including BuildingMembers and Announcements, with RootComponent properly using Layout without children prop.",
   "frontend/src/pages/Login.tsx": "Login page with three separate onboarding cards (Building Owner, Authority, Resident) displayed simultaneously in a responsive grid, each with its own Internet Identity login button that stores the selected flow type before authentication.",
   "frontend/src/pages/Dashboard.tsx": "Dashboard page displaying welcome message, user profile information, first login indicator, and system information using the caller's user profile from the backend.",
   "frontend/src/pages/Home.tsx": "Home page with conditional rendering that checks for stored onboarding flow on mount and displays appropriate onboarding UI (building creation for owners, invite code entry with role context for authority/resident), or role-based dashboard for users with buildings.",
   "frontend/src/pages/Profile.tsx": "Profile page displaying detailed user information including Principal ID, authentication method, account status, and user role with Turkish translations and role-specific descriptions using badges and card layouts.",
   "frontend/src/components/Layout.tsx": "Layout wrapper component providing consistent navigation header, main content area, and footer with Caffeine.ai attribution across all authenticated pages.",
-  "frontend/src/components/Navigation.tsx": "Responsive navigation component with desktop and mobile views, displaying menu items for Panel, Ana Sayfa, Kullanıcılar, and Profil with logout functionality and active state highlighting.",
+  "frontend/src/components/Navigation.tsx": "Updated navigation component with new menu items for Announcements and Building Members pages, maintaining responsive design and active state highlighting.",
   "frontend/src/index.css": "Global styles with OKLCH color system customized for building management theme using purple/indigo primary colors, supporting both light and dark modes.",
   "frontend/tailwind.config.js": "Tailwind CSS configuration with Inter font family, extended color tokens using OKLCH values, and custom design system for the building management application.",
   "frontend/src/pages/Users.tsx": "Users list page with placeholder implementation showing table structure for displaying user profiles including Principal ID, Name, Role column with Turkish translations, and First Login date using shadcn/ui Table components.",
@@ -15,5 +15,7 @@
   "frontend/src/utils/roleTranslations.ts": "Utility module that maps backend Role enum values (binaSahibi, yetkili, sakin) to Turkish display strings and provides badge variant selection for consistent role display across the application.",
   "frontend/src/components/InviteCodePanel.tsx": "Invite code management panel for BINA_SAHIBI users with role selection, code creation, copy-to-clipboard functionality, and table displaying all created codes with their status.",
   "frontend/src/components/InviteCodeRegistration.tsx": "Invite code registration form component with optional suggestedRole prop that displays role-specific messaging and validates 16-character codes with proper error handling and success callbacks.",
-  "frontend/src/utils/urlParams.ts": "Utility functions for URL parameter parsing and sessionStorage management, including new helpers for onboarding flow storage and retrieval (getOnboardingFlow, clearOnboardingFlow)."
+  "frontend/src/utils/urlParams.ts": "Utility module for URL parameter parsing and session storage management, including new onboarding flow helpers (storeOnboardingFlow, getOnboardingFlow, clearOnboardingFlow) for persisting user's selected registration path.",
+  "frontend/src/pages/BuildingMembers.tsx": "New page displaying all members registered to the building with role badges, statistics cards, and member table showing join dates and status.",
+  "frontend/src/pages/Announcements.tsx": "New announcements system page with create form (for authorized users), priority levels, and announcement list with author information and timestamps."
 }

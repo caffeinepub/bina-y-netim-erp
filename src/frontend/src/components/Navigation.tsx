@@ -1,107 +1,121 @@
-import { useState } from 'react';
 import { Link, useLocation } from '@tanstack/react-router';
 import { useInternetIdentity } from '../hooks/useInternetIdentity';
+import { useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import { Building2, Home, User, LogOut, Menu, Users } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Home, LayoutDashboard, Users, UserCircle, Menu, LogOut, Bell, UsersRound } from 'lucide-react';
+import { useState } from 'react';
 
 export default function Navigation() {
-  const { clear } = useInternetIdentity();
   const location = useLocation();
-  const [isOpen, setIsOpen] = useState(false);
+  const { clear, identity } = useInternetIdentity();
+  const queryClient = useQueryClient();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const navItems = [
-    { path: '/', label: 'Panel', icon: Building2 },
-    { path: '/home', label: 'Ana Sayfa', icon: Home },
-    { path: '/kullanicilar', label: 'Kullanıcılar', icon: Users },
-    { path: '/profile', label: 'Profil', icon: User }
-  ];
+  const isAuthenticated = !!identity;
 
-  const handleLogout = () => {
-    clear();
-    setIsOpen(false);
+  const handleLogout = async () => {
+    await clear();
+    queryClient.clear();
+    setMobileMenuOpen(false);
   };
 
-  const NavLinks = ({ mobile = false }: { mobile?: boolean }) => (
-    <>
-      {navItems.map((item) => {
-        const Icon = item.icon;
-        const isActive = location.pathname === item.path;
-        
-        return (
-          <Link
-            key={item.path}
-            to={item.path}
-            onClick={() => mobile && setIsOpen(false)}
-            className={cn(
-              'flex items-center gap-2 px-4 py-2 rounded-lg transition-colors',
-              isActive
-                ? 'bg-primary text-primary-foreground'
-                : 'text-muted-foreground hover:text-foreground hover:bg-muted',
-              mobile && 'w-full justify-start'
-            )}
-          >
-            <Icon className="w-4 h-4" />
-            <span className="font-medium">{item.label}</span>
-          </Link>
-        );
-      })}
-    </>
-  );
+  const menuItems = [
+    { path: '/dashboard', label: 'Panel', icon: LayoutDashboard },
+    { path: '/', label: 'Ana Sayfa', icon: Home },
+    { path: '/announcements', label: 'Duyurular', icon: Bell },
+    { path: '/building-members', label: 'Üyeler', icon: UsersRound },
+    { path: '/users', label: 'Kullanıcılar', icon: Users },
+    { path: '/profile', label: 'Profil', icon: UserCircle },
+  ];
+
+  const isActive = (path: string) => {
+    return location.pathname === path;
+  };
 
   return (
-    <nav className="border-b bg-card">
-      <div className="container mx-auto px-4 max-w-7xl">
-        <div className="flex items-center justify-between h-16">
-          <div className="flex items-center gap-2">
-            <Building2 className="w-6 h-6 text-primary" />
-            <span className="font-bold text-lg">Bina Yönetim ERP</span>
-          </div>
+    <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="container mx-auto px-4">
+        <div className="flex h-16 items-center justify-between">
+          {/* Logo */}
+          <Link to="/" className="flex items-center space-x-2">
+            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+              <Home className="w-5 h-5 text-primary-foreground" />
+            </div>
+            <span className="font-bold text-xl">Bina Yönetim</span>
+          </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-2">
-            <NavLinks />
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleLogout}
-              className="ml-2 text-muted-foreground hover:text-foreground"
-            >
-              <LogOut className="w-4 h-4 mr-2" />
-              Çıkış Yap
-            </Button>
+          <div className="hidden md:flex items-center space-x-1">
+            {menuItems.map((item) => {
+              const Icon = item.icon;
+              return (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  className={`flex items-center space-x-2 px-4 py-2 rounded-md transition-colors ${
+                    isActive(item.path)
+                      ? 'bg-primary text-primary-foreground'
+                      : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                  }`}
+                >
+                  <Icon className="w-4 h-4" />
+                  <span>{item.label}</span>
+                </Link>
+              );
+            })}
           </div>
 
-          {/* Mobile Navigation */}
-          <div className="md:hidden">
-            <Sheet open={isOpen} onOpenChange={setIsOpen}>
-              <SheetTrigger asChild>
-                <Button variant="ghost" size="icon">
-                  <Menu className="w-5 h-5" />
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="right" className="w-64">
-                <SheetHeader>
-                  <SheetTitle className="flex items-center gap-2">
-                    <Building2 className="w-5 h-5 text-primary" />
-                    Menü
-                  </SheetTitle>
-                </SheetHeader>
-                <div className="flex flex-col gap-2 mt-6">
-                  <NavLinks mobile />
-                  <Button
-                    variant="ghost"
-                    onClick={handleLogout}
-                    className="w-full justify-start text-muted-foreground hover:text-foreground mt-4"
-                  >
-                    <LogOut className="w-4 h-4 mr-2" />
-                    Çıkış Yap
-                  </Button>
-                </div>
-              </SheetContent>
-            </Sheet>
+          {/* Desktop Logout */}
+          <div className="hidden md:block">
+            {isAuthenticated && (
+              <Button variant="outline" onClick={handleLogout}>
+                <LogOut className="w-4 h-4 mr-2" />
+                Çıkış Yap
+              </Button>
+            )}
           </div>
+
+          {/* Mobile Menu */}
+          <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+            <SheetTrigger asChild className="md:hidden">
+              <Button variant="ghost" size="icon">
+                <Menu className="h-6 w-6" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="right" className="w-64">
+              <div className="flex flex-col space-y-4 mt-8">
+                {menuItems.map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <Link
+                      key={item.path}
+                      to={item.path}
+                      onClick={() => setMobileMenuOpen(false)}
+                      className={`flex items-center space-x-3 px-4 py-3 rounded-md transition-colors ${
+                        isActive(item.path)
+                          ? 'bg-primary text-primary-foreground'
+                          : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                      }`}
+                    >
+                      <Icon className="w-5 h-5" />
+                      <span className="font-medium">{item.label}</span>
+                    </Link>
+                  );
+                })}
+                {isAuthenticated && (
+                  <>
+                    <div className="border-t pt-4">
+                      <Button variant="outline" onClick={handleLogout} className="w-full justify-start">
+                        <LogOut className="w-5 h-5 mr-3" />
+                        Çıkış Yap
+                      </Button>
+                    </div>
+                  </>
+                )}
+              </div>
+            </SheetContent>
+          </Sheet>
         </div>
       </div>
     </nav>

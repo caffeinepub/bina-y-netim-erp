@@ -1,68 +1,161 @@
-import { createRouter, RouterProvider, createRoute, createRootRoute, Outlet, redirect } from '@tanstack/react-router';
-import { useInternetIdentity } from './hooks/useInternetIdentity';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { RouterProvider, createRouter, createRoute, createRootRoute, Outlet, Navigate } from '@tanstack/react-router';
+import { InternetIdentityProvider, useInternetIdentity } from './hooks/useInternetIdentity';
+import { Toaster } from '@/components/ui/sonner';
+import { ThemeProvider } from 'next-themes';
+import Layout from './components/Layout';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Home from './pages/Home';
 import Profile from './pages/Profile';
 import Users from './pages/Users';
-import Layout from './components/Layout';
+import BuildingMembers from './pages/BuildingMembers';
+import Announcements from './pages/Announcements';
+import { useGetCallerUserProfile } from './hooks/useQueries';
+import { Skeleton } from '@/components/ui/skeleton';
+import { useEffect, useState } from 'react';
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 5,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
+
+function ProtectedRoute({ children }: { children: React.ReactNode }) {
+  const { identity, isInitializing } = useInternetIdentity();
+  const { data: userProfile, isLoading: profileLoading, isFetched } = useGetCallerUserProfile();
+  const [showProfileSetup, setShowProfileSetup] = useState(false);
+
+  const isAuthenticated = !!identity;
+
+  useEffect(() => {
+    if (isAuthenticated && !profileLoading && isFetched) {
+      setShowProfileSetup(userProfile === null);
+    }
+  }, [isAuthenticated, profileLoading, isFetched, userProfile]);
+
+  if (isInitializing || (isAuthenticated && profileLoading)) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="space-y-4 w-full max-w-md px-4">
+          <Skeleton className="h-12 w-full" />
+          <Skeleton className="h-32 w-full" />
+          <Skeleton className="h-12 w-full" />
+        </div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" />;
+  }
+
+  if (showProfileSetup) {
+    return <Navigate to="/profile" />;
+  }
+
+  return <>{children}</>;
+}
+
+function RootComponent() {
+  const { identity } = useInternetIdentity();
+  const isAuthenticated = !!identity;
+
+  return (
+    <>
+      {isAuthenticated ? (
+        <Layout />
+      ) : (
+        <Outlet />
+      )}
+    </>
+  );
+}
 
 const rootRoute = createRootRoute({
-  component: () => <Outlet />
+  component: RootComponent,
 });
 
 const loginRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/login',
-  component: Login
-});
-
-const layoutRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  id: 'layout',
-  component: Layout,
-  beforeLoad: ({ context }: any) => {
-    if (!context.isAuthenticated) {
-      throw redirect({ to: '/login' });
-    }
-  }
+  component: Login,
 });
 
 const dashboardRoute = createRoute({
-  getParentRoute: () => layoutRoute,
-  path: '/',
-  component: Dashboard
+  getParentRoute: () => rootRoute,
+  path: '/dashboard',
+  component: () => (
+    <ProtectedRoute>
+      <Dashboard />
+    </ProtectedRoute>
+  ),
 });
 
 const homeRoute = createRoute({
-  getParentRoute: () => layoutRoute,
-  path: '/home',
-  component: Home
+  getParentRoute: () => rootRoute,
+  path: '/',
+  component: () => (
+    <ProtectedRoute>
+      <Home />
+    </ProtectedRoute>
+  ),
 });
 
 const profileRoute = createRoute({
-  getParentRoute: () => layoutRoute,
+  getParentRoute: () => rootRoute,
   path: '/profile',
-  component: Profile
+  component: () => (
+    <ProtectedRoute>
+      <Profile />
+    </ProtectedRoute>
+  ),
 });
 
 const usersRoute = createRoute({
-  getParentRoute: () => layoutRoute,
+  getParentRoute: () => rootRoute,
   path: '/users',
-  component: Users
+  component: () => (
+    <ProtectedRoute>
+      <Users />
+    </ProtectedRoute>
+  ),
+});
+
+const buildingMembersRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/building-members',
+  component: () => (
+    <ProtectedRoute>
+      <BuildingMembers />
+    </ProtectedRoute>
+  ),
+});
+
+const announcementsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/announcements',
+  component: () => (
+    <ProtectedRoute>
+      <Announcements />
+    </ProtectedRoute>
+  ),
 });
 
 const routeTree = rootRoute.addChildren([
   loginRoute,
-  layoutRoute.addChildren([dashboardRoute, homeRoute, profileRoute, usersRoute])
+  dashboardRoute,
+  homeRoute,
+  profileRoute,
+  usersRoute,
+  buildingMembersRoute,
+  announcementsRoute,
 ]);
 
-const router = createRouter({
-  routeTree,
-  context: {
-    isAuthenticated: false
-  }
-});
+const router = createRouter({ routeTree });
 
 declare module '@tanstack/react-router' {
   interface Register {
@@ -70,20 +163,17 @@ declare module '@tanstack/react-router' {
   }
 }
 
-export default function App() {
-  const { identity, isInitializing } = useInternetIdentity();
-  const isAuthenticated = !!identity && !isInitializing;
-
-  if (isInitializing) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-background">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Yükleniyor...</p>
-        </div>
-      </div>
-    );
-  }
-
-  return <RouterProvider router={router} context={{ isAuthenticated }} />;
+function App() {
+  return (
+    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+      <QueryClientProvider client={queryClient}>
+        <InternetIdentityProvider>
+          <RouterProvider router={router} />
+          <Toaster />
+        </InternetIdentityProvider>
+      </QueryClientProvider>
+    </ThemeProvider>
+  );
 }
+
+export default App;

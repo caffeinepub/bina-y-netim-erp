@@ -1,108 +1,12 @@
 {
   "kind": "build_request",
-  "title": "Redesign login screen with three separate onboarding cards displayed simultaneously",
-  "projectName": "Building Management ERP",
+  "title": "Continue development with positive feedback",
   "priority": "normal",
-  "requirements": [
-    {
-      "id": "REQ-36",
-      "text": "Redesign the Login page (frontend/src/pages/Login.tsx) to display three distinct onboarding cards/panels simultaneously on the same screen: (1) Building Owner card with 'Bina Oluştur' (Create Building) option, (2) Authority card with 'Davet Kodu Gir' (Enter Invite Code) option for YETKILI role, and (3) Resident/Staff card with 'Davet Kodu Gir' (Enter Invite Code) option for SAKIN role",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-5"
-        ],
-        "quotes": [
-          "BEN 3 FARKLI PENCERE İSTİYORUM AYNI EKRANDA"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Three separate cards/panels are visible simultaneously on the login screen",
-        "Each card is clearly labeled in Turkish indicating its intended user type (Bina Sahibi, Yetkili, Sakin/Personel)",
-        "Cards are displayed in a responsive grid layout that works on both desktop and mobile devices",
-        "Each card contains its own Internet Identity login button",
-        "The layout is horizontally arranged on desktop (3 columns) and stacks vertically on mobile"
-      ]
-    },
-    {
-      "id": "REQ-37",
-      "text": "Implement onboarding flow selection mechanism where clicking the Internet Identity button within each card stores the selected flow type (building-owner, authority, or resident) in session storage or state before initiating authentication",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-5"
-        ],
-        "quotes": [
-          "BEN 3 FARKLI PENCERE İSTİYORUM AYNI EKRANDA"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Each card's Internet Identity button stores the selected onboarding flow type before authentication",
-        "The selected flow persists through the authentication process",
-        "After successful authentication, users are redirected to the appropriate post-login experience based on their selected flow"
-      ]
-    },
-    {
-      "id": "REQ-38",
-      "text": "Update the post-login routing logic to handle the three onboarding flows: (1) Building Owner flow redirects to building creation form, (2) Authority flow redirects to invite code entry for YETKILI role, (3) Resident flow redirects to invite code entry for SAKIN role",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-5"
-        ],
-        "quotes": [
-          "BEN 3 FARKLI PENCERE İSTİYORUM AYNI EKRANDA"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Users selecting Building Owner flow are shown the building creation interface after authentication",
-        "Users selecting Authority flow are shown invite code entry with YETKILI role context",
-        "Users selecting Resident flow are shown invite code entry with SAKIN role context",
-        "The routing respects existing authentication and building association checks",
-        "Users already associated with a building are redirected to their normal home page regardless of selected flow"
-      ]
-    },
-    {
-      "id": "REQ-39",
-      "text": "Design each onboarding card with a clear visual hierarchy including an icon or illustration representing the user type, a title in Turkish, a brief description of that user type's purpose, and a prominent Internet Identity login button with role-specific styling",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-5"
-        ],
-        "quotes": [
-          "BEN 3 FARKLI PENCERE İSTİYORUM AYNI EKRANDA"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Each card includes a visual icon or illustration distinguishing the user type",
-        "Card titles clearly identify the user type in Turkish (Bina Sahibi, Yetkili, Sakin/Personel)",
-        "Each card includes a 2-3 sentence description in Turkish explaining that user type's role",
-        "Internet Identity buttons are visually distinct for each card using color coding or styling",
-        "Cards use consistent spacing and styling aligned with existing shadcn/ui component patterns"
-      ]
-    }
-  ],
-  "constraints": [
-    "Must maintain Internet Identity as the sole authentication method",
-    "All UI text must be in Turkish",
-    "Must preserve existing authentication flow and user profile system",
-    "Layout must be fully responsive for mobile devices",
-    "Must use existing shadcn/ui components and Tailwind CSS styling patterns"
-  ],
-  "nonGoals": [
-    "Adding additional authentication providers beyond Internet Identity",
-    "Modifying the backend authentication or user management logic",
-    "Changing the role system or permissions structure",
-    "Adding user registration forms separate from invite code flow",
-    "Implementing email or SMS verification"
-  ],
+  "requirements": [],
+  "constraints": [],
+  "nonGoals": [],
   "imageRequirements": {
-    "required": [
-      "Building owner icon illustration showing a person with keys or building symbol (building-owner-icon.dim_128x128.png)",
-      "Authority figure icon illustration showing a professional or manager (authority-icon.dim_128x128.png)",
-      "Resident icon illustration showing a person or home symbol (resident-icon.dim_128x128.png)"
-    ],
+    "required": [],
     "edits": []
   }
 }

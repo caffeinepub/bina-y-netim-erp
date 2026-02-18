@@ -9,8 +9,6 @@ import Iter "mo:core/Iter";
 import AccessControl "authorization/access-control";
 import MixinAuthorization "authorization/MixinAuthorization";
 
-
-
 actor {
   let accessControlState = AccessControl.initState();
   include MixinAuthorization(accessControlState);
@@ -124,14 +122,18 @@ actor {
 
     let existingProfile = userProfiles.get(caller);
 
-    let preservedBinaId = switch (existingProfile) {
-      case (null) { profile.binaId };
-      case (?existing) { existing.binaId };
-    };
-
-    let preservedRole = switch (existingProfile) {
-      case (null) { profile.role };
-      case (?existing) { existing.role };
+    // SECURITY FIX: Always preserve binaId and role from existing profile
+    // If no existing profile, user must use binaOlustur or davetKoduIleKayitOl
+    let (preservedBinaId, preservedRole) = switch (existingProfile) {
+      case (null) {
+        // New users cannot set binaId or role through saveCallerUserProfile
+        // They must use binaOlustur or davetKoduIleKayitOl
+        (null, #sakin);
+      };
+      case (?existing) {
+        // Existing users cannot modify their binaId or role through this function
+        (existing.binaId, existing.role);
+      };
     };
 
     let secureProfile : UserProfile = {
