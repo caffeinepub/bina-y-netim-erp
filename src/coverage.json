@@ -1,7 +1,7 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-18T22:16:15.256Z",
+  "generatedAt": "2026-02-18T22:37:08.675Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
@@ -17,10 +17,9 @@
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/App.tsx",
-    "frontend/src/components/Navigation.tsx",
-    "frontend/src/pages/Announcements.tsx",
+    "frontend/src/components/InviteCodePanel.tsx",
     "frontend/src/pages/BuildingMembers.tsx",
+    "frontend/src/pages/Home.tsx",
     "frontend/src/utils/urlParams.ts",
     "project_state.json",
     "scratch/component-selection.json",

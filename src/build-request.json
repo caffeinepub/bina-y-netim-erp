@@ -1,10 +1,20 @@
 {
   "kind": "build_request",
-  "title": "Continue development with positive feedback",
+  "title": "Continue development with improvements",
+  "projectName": "Bina Yönetim ERP",
   "priority": "normal",
   "requirements": [],
-  "constraints": [],
-  "nonGoals": [],
+  "constraints": [
+    "Maintain single-actor backend architecture",
+    "Preserve immutable frontend paths (hooks/useInternetIdentity.ts, hooks/useActor.ts, main.tsx, components/ui)",
+    "Keep all UI text in Turkish",
+    "Maintain existing role-based access control hierarchy"
+  ],
+  "nonGoals": [
+    "Adding new features not mentioned by user",
+    "Changing technology stack",
+    "Modifying authentication system"
+  ],
   "imageRequirements": {
     "required": [],
     "edits": []

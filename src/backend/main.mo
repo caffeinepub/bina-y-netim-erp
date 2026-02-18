@@ -56,6 +56,19 @@ actor {
       Runtime.trap("Yetkisiz: Sadece kullanıcılar bina oluşturabilir");
     };
 
+    // SECURITY FIX: Check if user already has a building assignment
+    switch (userProfiles.get(caller)) {
+      case (?existingProfile) {
+        switch (existingProfile.binaId) {
+          case (?_) {
+            Runtime.trap("Zaten bir binaya kayıtlısınız. Birden fazla bina oluşturamazsınız.");
+          };
+          case (null) { /* Can proceed */ };
+        };
+      };
+      case (null) { /* New user, can proceed */ };
+    };
+
     let binaId = binaCount;
     binaCount += 1;
 
@@ -122,7 +135,7 @@ actor {
 
     let existingProfile = userProfiles.get(caller);
 
-    // SECURITY FIX: Always preserve binaId and role from existing profile
+    // SECURITY: Always preserve binaId and role from existing profile
     // If no existing profile, user must use binaOlustur or davetKoduIleKayitOl
     let (preservedBinaId, preservedRole) = switch (existingProfile) {
       case (null) {
@@ -149,6 +162,7 @@ actor {
   };
 
   public query ({ caller }) func getUserProfile(user : Principal) : async ?UserProfile {
+    // SECURITY FIX: Strengthen authorization - only admins or the user themselves can view profiles
     if (caller != user and not AccessControl.isAdmin(accessControlState, caller)) {
       Runtime.trap("Yetkisiz: Sadece kendi profilinizi görüntüleyebilirsiniz");
     };
@@ -183,7 +197,7 @@ actor {
     };
   };
 
-  public shared ({ caller }) func davetKoduOlustur(rol : Role) : async Text {
+  public shared ({ caller }) func davetKoduOlustur(yeniRol : Role) : async Text {
     // Authorization: Only authenticated users can create invite codes
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Yetkisiz: Sadece kullanıcılar davet kodu oluşturabilir");
@@ -196,6 +210,36 @@ actor {
       case (?profile) { profile };
     };
 
+    let callerRol = callerProfile.role;
+
+    // SECURITY: Hierarchical permission enforcement
+    switch (callerRol, yeniRol) {
+      case (#binaSahibi, #binaSahibi) {
+        // BINA_SAHIBI can create BINA_SAHIBI codes
+      };
+      case (#binaSahibi, #yetkili) {
+        // BINA_SAHIBI can create YETKILI codes
+      };
+      case (#binaSahibi, #sakin) {
+        // BINA_SAHIBI can create SAKIN codes
+      };
+      case (#yetkili, #sakin) {
+        // YETKILI can create SAKIN codes
+      };
+      case (#yetkili, #yetkili) {
+        // YETKILI cannot create YETKILI codes
+        Runtime.trap("Yetkililer başka yetkili davet edemez");
+      };
+      case (#yetkili, #binaSahibi) {
+        // YETKILI cannot create BINA_SAHIBI codes
+        Runtime.trap("Yetkili kullanıcı bina sahibi davet edemez");
+      };
+      case (#sakin, _) {
+        // SAKIN cannot create any codes
+        Runtime.trap("Sakin kullanıcı davet kodu oluşturamaz");
+      };
+    };
+
     let binaId = switch (callerProfile.binaId) {
       case (null) {
         Runtime.trap("Kullanıcının binaID'si yok: Lütfen önce bir bina oluşturun");
@@ -203,20 +247,11 @@ actor {
       case (?id) { id };
     };
 
-    // Authorization: Only building owners or authorized personnel can create invite codes
-    switch (callerProfile.role) {
-      case (#binaSahibi) { /* Authorized */ };
-      case (#yetkili) { /* Authorized */ };
-      case (#sakin) {
-        Runtime.trap("Yetkisiz: Sadece bina sahipleri ve yetkililer davet kodu oluşturabilir");
-      };
-    };
-
     let kod = generateUniqueCode();
     let yeniDavetKodu : DavetKodu = {
       kod;
       binaId;
-      rol;
+      rol = yeniRol;
       olusturanPrincipal = caller;
       olusturmaTarihi = Time.now();
       kullanildiMi = false;
@@ -245,7 +280,7 @@ actor {
       Runtime.trap("Davet kodu zaten kullanılmış");
     };
 
-    // Check if user already has a building assignment
+    // SECURITY: Check if user already has a building assignment
     let existingProfile = userProfiles.get(caller);
     switch (existingProfile) {
       case (?profile) {
@@ -253,6 +288,31 @@ actor {
           case (?existingBinaId) {
             if (existingBinaId != davetKodu.binaId) {
               Runtime.trap("Zaten başka bir binaya kayıtlısınız");
+            };
+            // SECURITY FIX: If already in same building, prevent role escalation
+            // User cannot use invite code to upgrade their role
+            switch (profile.role, davetKodu.rol) {
+              case (#binaSahibi, _) {
+                Runtime.trap("Bina sahibi olarak zaten en yüksek yetkiye sahipsiniz");
+              };
+              case (#yetkili, #binaSahibi) {
+                Runtime.trap("Yetkili kullanıcı bina sahibi olamaz");
+              };
+              case (#yetkili, #yetkili) {
+                Runtime.trap("Zaten yetkili kullanıcısınız");
+              };
+              case (#sakin, #binaSahibi) {
+                Runtime.trap("Sakin kullanıcı bina sahibi olamaz");
+              };
+              case (#sakin, #yetkili) {
+                // Allow sakin to become yetkili
+              };
+              case (#sakin, #sakin) {
+                Runtime.trap("Zaten sakin kullanıcısınız");
+              };
+              case (#yetkili, #sakin) {
+                Runtime.trap("Yetkili kullanıcı sakin olamaz");
+              };
             };
           };
           case (null) { /* No existing building, can proceed */ };
@@ -300,7 +360,7 @@ actor {
       Runtime.trap("Yetkisiz: Sadece kullanıcılar davet kodlarını listeleyebilir");
     };
 
-    // Filter to only show codes created by the caller
+    // SECURITY: Filter to only show codes created by the caller
     let filteredEntries = davetKodlari.entries().toArray().filter(
       func((_, davetKodu)) {
         davetKodu.olusturanPrincipal == caller;

@@ -130,7 +130,7 @@ export interface backendInterface {
     binaOlustur(binaAdi: string): Promise<bigint>;
     davetKodlariniListele(): Promise<Array<DavetKodu>>;
     davetKoduIleKayitOl(kod: string): Promise<string>;
-    davetKoduOlustur(rol: Role): Promise<string>;
+    davetKoduOlustur(yeniRol: Role): Promise<string>;
     getCallerUserProfile(): Promise<UserProfile | null>;
     getCallerUserRole(): Promise<UserRole>;
     getUserProfile(user: Principal): Promise<UserProfile | null>;

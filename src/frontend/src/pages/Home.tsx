@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Home as HomeIcon, Building2, Users, Bell, Plus } from 'lucide-react';
-import { useGetUserBuilding, useGetCallerUserProfile } from '@/hooks/useQueries';
+import { Home as HomeIcon, Building2, Users, Bell, Plus, TrendingUp, Activity } from 'lucide-react';
+import { useGetUserBuilding, useGetCallerUserProfile, useGetInviteCodes } from '@/hooks/useQueries';
 import BuildingCreateForm from '@/components/BuildingCreateForm';
 import InviteCodePanel from '@/components/InviteCodePanel';
 import InviteCodeRegistration from '@/components/InviteCodeRegistration';
@@ -18,10 +18,22 @@ export default function Home() {
   
   const { data: building, isLoading: buildingLoading, isFetched: buildingFetched, error: buildingError } = useGetUserBuilding();
   const { data: userProfile, isLoading: profileLoading, isFetched: profileFetched } = useGetCallerUserProfile();
+  const { data: inviteCodes } = useGetInviteCodes();
 
   const hasBuilding = userProfile?.binaId !== null && userProfile?.binaId !== undefined;
   const userRole = userProfile?.role;
   const isBinaSahibi = userRole === Role.binaSahibi;
+  const isYetkili = userRole === Role.yetkili;
+  const isSakin = userRole === Role.sakin;
+
+  // Determine if user can create invite codes (BINA_SAHIBI or YETKILI)
+  const canCreateInviteCodes = isBinaSahibi || isYetkili;
+
+  // Calculate statistics
+  const totalInviteCodes = inviteCodes?.length || 0;
+  const usedInviteCodes = inviteCodes?.filter(code => code.kullanildiMi).length || 0;
+  const activeInviteCodes = totalInviteCodes - usedInviteCodes;
+  const totalMembers = 1 + usedInviteCodes; // 1 for building owner + used codes
 
   // Check for onboarding flow on mount
   useEffect(() => {
@@ -50,7 +62,7 @@ export default function Home() {
     }
 
     return (
-      <Card className="bg-primary/5 border-primary/20">
+      <Card className="bg-gradient-to-br from-primary/10 via-primary/5 to-background border-primary/20">
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle className="flex items-center gap-2">
@@ -58,26 +70,48 @@ export default function Home() {
               {building?.binaAdi}
             </CardTitle>
             {userProfile && (
-              <Badge variant={getRoleVariant(userProfile.role)}>
+              <Badge variant={getRoleVariant(userProfile.role)} className="text-sm">
                 {getRoleDisplayName(userProfile.role)}
               </Badge>
             )}
           </div>
           <CardDescription>
-            Bina yönetim sisteminiz aktif
+            Bina yönetim sisteminiz aktif ve çalışıyor
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="text-sm text-muted-foreground">
-            <p>
-              Oluşturulma Tarihi:{' '}
-              {building && new Date(Number(building.olusturulmaTarihi) / 1000000).toLocaleDateString('tr-TR', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-              })}
-            </p>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1">
+              <p className="text-sm text-muted-foreground">Oluşturulma Tarihi</p>
+              <p className="text-sm font-medium">
+                {building && new Date(Number(building.olusturulmaTarihi) / 1000000).toLocaleDateString('tr-TR', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
+                })}
+              </p>
+            </div>
+            <div className="space-y-1">
+              <p className="text-sm text-muted-foreground">Toplam Üye</p>
+              <p className="text-sm font-medium">{totalMembers} Kullanıcı</p>
+            </div>
           </div>
+          
+          {canCreateInviteCodes && (
+            <div className="pt-4 border-t">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium">Davet Kodları</p>
+                  <p className="text-xs text-muted-foreground">
+                    {activeInviteCodes} aktif, {usedInviteCodes} kullanılmış
+                  </p>
+                </div>
+                <Badge variant="secondary" className="text-lg font-bold">
+                  {totalInviteCodes}
+                </Badge>
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
     );
@@ -275,14 +309,14 @@ export default function Home() {
               {/* Building Status Section */}
               {building && renderRoleBasedContent()}
 
-              {/* Invite Code Panel - Only for BINA_SAHIBI */}
-              {isBinaSahibi && <InviteCodePanel />}
+              {/* Invite Code Panel - Only for BINA_SAHIBI and YETKILI */}
+              {canCreateInviteCodes && <InviteCodePanel />}
 
               {/* Stats Grid */}
               <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-                <Card>
+                <Card className="hover:shadow-md transition-shadow">
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Binalar</CardTitle>
+                    <CardTitle className="text-sm font-medium">Bina</CardTitle>
                     <Building2 className="h-4 w-4 text-muted-foreground" />
                   </CardHeader>
                   <CardContent>
@@ -291,63 +325,84 @@ export default function Home() {
                   </CardContent>
                 </Card>
 
-                <Card>
+                <Card className="hover:shadow-md transition-shadow">
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">Kullanıcılar</CardTitle>
                     <Users className="h-4 w-4 text-muted-foreground" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">-</div>
-                    <p className="text-xs text-muted-foreground">Yakında eklenecek</p>
+                    <div className="text-2xl font-bold">{totalMembers}</div>
+                    <p className="text-xs text-muted-foreground">Kayıtlı kullanıcı</p>
+                    {usedInviteCodes > 0 && (
+                      <div className="flex items-center gap-1 mt-1">
+                        <TrendingUp className="h-3 w-3 text-green-600" />
+                        <span className="text-xs text-green-600">+{usedInviteCodes} yeni</span>
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
 
-                <Card>
+                <Card className="hover:shadow-md transition-shadow">
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Duyurular</CardTitle>
-                    <Bell className="h-4 w-4 text-muted-foreground" />
+                    <CardTitle className="text-sm font-medium">Davet Kodları</CardTitle>
+                    <Activity className="h-4 w-4 text-muted-foreground" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">-</div>
-                    <p className="text-xs text-muted-foreground">Yakında eklenecek</p>
+                    <div className="text-2xl font-bold">{activeInviteCodes}</div>
+                    <p className="text-xs text-muted-foreground">Aktif kod</p>
+                    {totalInviteCodes > 0 && (
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {totalInviteCodes} toplam
+                      </p>
+                    )}
                   </CardContent>
                 </Card>
 
-                <Card>
+                <Card className="hover:shadow-md transition-shadow">
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Sistem</CardTitle>
+                    <CardTitle className="text-sm font-medium">Sistem Durumu</CardTitle>
                     <HomeIcon className="h-4 w-4 text-muted-foreground" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">Aktif</div>
-                    <p className="text-xs text-muted-foreground">Çalışıyor</p>
+                    <div className="text-2xl font-bold text-green-600">✓</div>
+                    <p className="text-xs text-muted-foreground">Tüm sistemler çalışıyor</p>
                   </CardContent>
                 </Card>
               </div>
 
-              {/* Welcome Card */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Hoş Geldiniz</CardTitle>
-                  <CardDescription>
-                    Bina Yönetim ERP sisteminiz hazır
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <p className="text-sm text-muted-foreground">
-                    Bina yönetim sisteminiz başarıyla kuruldu. Artık kullanıcı yönetimi, 
-                    duyurular, görevler ve diğer modülleri kullanmaya başlayabilirsiniz.
-                  </p>
-                  <div className="bg-muted/50 p-4 rounded-lg">
-                    <h3 className="font-medium mb-2">Sonraki Adımlar:</h3>
-                    <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
-                      <li>Davet kodu ile yeni kullanıcılar ekleyin</li>
-                      <li>Rol bazlı yetkilendirme sistemi aktif</li>
-                      <li>ERP modülleri (Arıza, Duyuru, Görev, Aidat)</li>
-                    </ul>
-                  </div>
-                </CardContent>
-              </Card>
+              {/* Quick Actions */}
+              {canCreateInviteCodes && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg">Hızlı İşlemler</CardTitle>
+                    <CardDescription>
+                      Sık kullanılan işlemlere hızlı erişim
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid gap-4 md:grid-cols-2">
+                      <Button variant="outline" className="h-auto py-4 justify-start" asChild>
+                        <a href="/building-members">
+                          <Users className="mr-3 h-5 w-5" />
+                          <div className="text-left">
+                            <p className="font-medium">Üyeleri Görüntüle</p>
+                            <p className="text-xs text-muted-foreground">Tüm bina üyelerini listele</p>
+                          </div>
+                        </a>
+                      </Button>
+                      <Button variant="outline" className="h-auto py-4 justify-start" asChild>
+                        <a href="/announcements">
+                          <Bell className="mr-3 h-5 w-5" />
+                          <div className="text-left">
+                            <p className="font-medium">Duyurular</p>
+                            <p className="text-xs text-muted-foreground">Duyuruları yönet</p>
+                          </div>
+                        </a>
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
             </>
           )}
         </>

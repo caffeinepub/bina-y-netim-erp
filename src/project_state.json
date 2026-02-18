@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 17,
+  "projectStateVersion": 21,
   "summary": "Bina Yönetim ERP Uygulaması - Multi-tenant, rol bazlı bina yönetim sistemi. Internet Identity tek kimlik doğrulama yöntemi. Davet kodu giriş yöntemi değil, rol ve bina eşleştirme aracıdır. Kullanıcılar Internet Identity ile giriş yapar, binaya bağlı değilse davet kodu girer veya bina oluşturur. Onboarding akışı: Bina Sahibi (bina oluşturma), Yetkili (davet kodu), Sakin/Personel (davet kodu). Login ekranında 3 farklı onboarding akışı seçeneği aynı anda gösterilecek.",
   "architectural_notes": [
     "Internet Identity tek kimlik doğrulama yöntemi",
@@ -208,6 +208,30 @@
         "REQ-39"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-update-the-invitecodepanel-component-frontend-src-components-invitecodepanel-tsx-to-dynamically-display-role-selection-options-based-on-the-authenticated-user-s-role-if-user-is-bina-sahibi-show-dropdown-options-for-both-yetkili-and-sakin-if-user-is-yetkili-show-only-sakin-option-if-user-is-sakin-hide-the-entire-invite-code-creation-panel",
+      "title": "Update the InviteCodePanel component (frontend/src/components/InviteCodePanel.tsx) to dynamically display role selection options based on the authenticated user's role: if user is BINA_SAHIBI, show dropdown options for both 'Yetkili' and 'Sakin'; if user is YETKILI, show only 'Sakin' option; if user is SAKIN, hide the entire invite code creation panel.",
+      "reqIds": [
+        "REQ-41"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-home-page-frontend-src-pages-home-tsx-to-conditionally-render-the-invitecodepanel-only-for-users-with-bina-sahibi-or-yetkili-roles-ensuring-sakin-users-do-not-see-any-invite-code-management-interface-on-the-home-page",
+      "title": "Update the Home page (frontend/src/pages/Home.tsx) to conditionally render the InviteCodePanel only for users with BINA_SAHIBI or YETKILI roles, ensuring SAKIN users do not see any invite code management interface on the home page.",
+      "reqIds": [
+        "REQ-43"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-frontend-error-handling-in-the-invitecodepanel-component-to-display-turkish-error-messages-when-invite-code-creation-fails-due-to-insufficient-permissions-using-the-toast-or-alert-pattern-consistent-with-existing-error-handling-in-the-application",
+      "title": "Add frontend error handling in the InviteCodePanel component to display Turkish error messages when invite code creation fails due to insufficient permissions, using the toast or alert pattern consistent with existing error handling in the application.",
+      "reqIds": [
+        "REQ-44"
+      ],
+      "version": 1
     }
   ],
   "new_feature_requests": [
@@ -371,6 +395,40 @@
       "id": "AR-44",
       "summary": "Ana sayfada binaya bağlı olmayan kullanıcılar için 'Bina Oluştur' ve 'Davet Kodu Gir' seçeneklerini göster, binaya bağlı kullanıcılar için normal panel göster",
       "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-45",
+      "summary": "Implement hierarchical invite code permissions: BINA_SAHIBI can create codes for YETKILI and SAKIN; YETKILI can create codes only for SAKIN; SAKIN cannot create codes",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-46",
+      "summary": "Update davetKoduOlustur backend function to validate that the calling user has permission to create codes for the requested role based on hierarchy (BINA_SAHIBI → YETKILI/SAKIN, YETKILI → SAKIN only)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-47",
+      "summary": "Update frontend invite code management panel to show role options based on user's role: BINA_SAHIBI sees YETKILI and SAKIN options; YETKILI sees only SAKIN option; SAKIN sees no panel",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-48",
+      "summary": "Update the backend davetKoduOlustur function to enforce hierarchical permissions: BINA_SAHIBI users can create invite codes for YETKILI or SAKIN roles; YETKILI users can create invite codes only for SAKIN role; SAKIN users cannot create any invite codes. Return appropriate error messages in Turkish when a user attempts to create a code for a role they lack permission to assign.",
+      "reqIds": [
+        "REQ-40"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-50",
+      "summary": "Add a backend validation check in the davetKoduOlustur function to prevent YETKILI users from creating invite codes for the YETKILI role, returning a Turkish error message such as 'Yetkililer başka yetkili davet edemez' when this restriction is violated.",
+      "reqIds": [
+        "REQ-42"
+      ],
       "status": "pending"
     }
   ],
