@@ -39,9 +39,13 @@ export default function Home() {
   useEffect(() => {
     if (profileFetched && !hasBuilding) {
       const flow = getOnboardingFlow();
+      console.log('Home: Checking onboarding flow, profileFetched=', profileFetched, 'hasBuilding=', hasBuilding, 'flow=', flow);
+      
       if (flow === 'building-owner' || flow === 'authority' || flow === 'resident') {
+        console.log('Home: Setting onboarding mode to', flow);
         setOnboardingMode(flow);
         clearOnboardingFlow();
+        console.log('Home: Cleared onboarding flow from storage');
       }
     }
   }, [profileFetched, hasBuilding]);
@@ -119,6 +123,8 @@ export default function Home() {
 
   // Onboarding section for users without buildings
   const renderOnboardingSection = () => {
+    console.log('Home: Rendering onboarding section, mode=', onboardingMode);
+    
     // If onboarding mode is set, show the specific flow
     if (onboardingMode === 'building-owner') {
       return (
@@ -128,7 +134,7 @@ export default function Home() {
               <div className="mx-auto w-16 h-16 bg-blue-500/10 rounded-2xl flex items-center justify-center mb-4">
                 <Building2 className="w-10 h-10 text-blue-600" />
               </div>
-              <CardTitle className="text-2xl">Bina Oluştur</CardTitle>
+              <CardTitle className="text-2xl">Hoş Geldiniz! Bina Oluşturun</CardTitle>
               <CardDescription>
                 Yeni bir bina oluşturun ve yönetmeye başlayın
               </CardDescription>
@@ -149,15 +155,15 @@ export default function Home() {
               <div className="mx-auto w-16 h-16 bg-purple-500/10 rounded-2xl flex items-center justify-center mb-4">
                 <Users className="w-10 h-10 text-purple-600" />
               </div>
-              <CardTitle className="text-2xl">Yetkili Olarak Katıl</CardTitle>
+              <CardTitle className="text-2xl">Yetkili Olarak Katılın</CardTitle>
               <CardDescription>
-                Davet kodunuzu girerek yetkili olarak binaya katılın
+                Bina yöneticisinden aldığınız YETKILI davet kodunu girin
               </CardDescription>
             </CardHeader>
             <CardContent>
               <InviteCodeRegistration 
-                suggestedRole={Role.yetkili}
                 onSuccess={handleInviteCodeSuccess}
+                suggestedRole={Role.yetkili}
               />
             </CardContent>
           </Card>
@@ -173,15 +179,15 @@ export default function Home() {
               <div className="mx-auto w-16 h-16 bg-green-500/10 rounded-2xl flex items-center justify-center mb-4">
                 <Users className="w-10 h-10 text-green-600" />
               </div>
-              <CardTitle className="text-2xl">Sakin/Personel Olarak Katıl</CardTitle>
+              <CardTitle className="text-2xl">Sakin Olarak Katılın</CardTitle>
               <CardDescription>
-                Davet kodunuzu girerek binaya katılın
+                Bina yöneticisinden aldığınız SAKIN davet kodunu girin
               </CardDescription>
             </CardHeader>
             <CardContent>
               <InviteCodeRegistration 
-                suggestedRole={Role.sakin}
                 onSuccess={handleInviteCodeSuccess}
+                suggestedRole={Role.sakin}
               />
             </CardContent>
           </Card>
@@ -189,70 +195,53 @@ export default function Home() {
       );
     }
 
-    // Default onboarding view (no specific flow selected)
+    // Default onboarding view when no specific mode is set
     return (
-      <div className="max-w-2xl mx-auto space-y-6">
+      <div className="max-w-4xl mx-auto space-y-6">
         <Card className="shadow-lg">
           <CardHeader className="text-center">
-            <div className="mx-auto w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mb-4">
-              <Building2 className="w-10 h-10 text-primary" />
-            </div>
-            <CardTitle className="text-2xl">Hoş Geldiniz</CardTitle>
+            <CardTitle className="text-2xl">Hoş Geldiniz!</CardTitle>
             <CardDescription>
-              Bina yönetim sistemini kullanmaya başlamak için aşağıdaki seçeneklerden birini kullanın
+              Başlamak için bir bina oluşturun veya davet kodu ile katılın
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
-            {/* Building Creation Section */}
-            <div className="space-y-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
-                  <Plus className="w-5 h-5 text-primary" />
-                </div>
-                <div>
-                  <h3 className="font-semibold">Yeni Bina Oluştur</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Kendi binanızı oluşturun ve yönetmeye başlayın
-                  </p>
-                </div>
-              </div>
-              {!showCreateForm ? (
-                <Button onClick={() => setShowCreateForm(true)} className="w-full" size="lg">
-                  <Plus className="mr-2 h-4 w-4" />
-                  Bina Oluştur
-                </Button>
-              ) : null}
-            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <Card className="border-2 hover:border-primary/50 transition-colors">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Building2 className="h-5 w-5 text-blue-600" />
+                    Bina Oluştur
+                  </CardTitle>
+                  <CardDescription>
+                    Yeni bir bina oluşturun ve yönetmeye başlayın
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button 
+                    onClick={() => setShowCreateForm(true)}
+                    className="w-full"
+                  >
+                    <Plus className="mr-2 h-4 w-4" />
+                    Bina Oluştur
+                  </Button>
+                </CardContent>
+              </Card>
 
-            {showCreateForm && (
-              <BuildingCreateForm onSuccess={handleCreateSuccess} />
-            )}
-
-            {/* Divider */}
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t" />
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-background px-2 text-muted-foreground">veya</span>
-              </div>
-            </div>
-
-            {/* Invite Code Section */}
-            <div className="space-y-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-secondary/10 rounded-lg flex items-center justify-center">
-                  <Users className="w-5 h-5 text-secondary" />
-                </div>
-                <div>
-                  <h3 className="font-semibold">Davet Kodu ile Katıl</h3>
-                  <p className="text-sm text-muted-foreground">
+              <Card className="border-2 hover:border-primary/50 transition-colors">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Users className="h-5 w-5 text-purple-600" />
+                    Davet Kodu ile Katıl
+                  </CardTitle>
+                  <CardDescription>
                     Mevcut bir binaya davet kodu ile katılın
-                  </p>
-                </div>
-              </div>
-
-              <InviteCodeRegistration onSuccess={handleInviteCodeSuccess} />
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <InviteCodeRegistration onSuccess={handleInviteCodeSuccess} />
+                </CardContent>
+              </Card>
             </div>
           </CardContent>
         </Card>
@@ -260,152 +249,129 @@ export default function Home() {
     );
   };
 
+  if (profileLoading || buildingLoading) {
+    return (
+      <div className="container mx-auto p-6 space-y-6">
+        <Skeleton className="h-12 w-64" />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <Skeleton className="h-32" />
+          <Skeleton className="h-32" />
+          <Skeleton className="h-32" />
+        </div>
+      </div>
+    );
+  }
+
+  // Show onboarding if user doesn't have a building
+  if (!hasBuilding) {
+    return (
+      <div className="container mx-auto p-6">
+        {renderOnboardingSection()}
+      </div>
+    );
+  }
+
+  // Main dashboard for users with buildings
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Ana Sayfa</h1>
-        <p className="text-muted-foreground mt-2">
-          Bina yönetim sisteminizin genel görünümü
-        </p>
+    <div className="container mx-auto p-6 space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold flex items-center gap-2">
+            <HomeIcon className="h-8 w-8 text-primary" />
+            Ana Sayfa
+          </h1>
+          <p className="text-muted-foreground mt-1">
+            Bina yönetim sisteminize hoş geldiniz
+          </p>
+        </div>
       </div>
 
-      {/* Loading State */}
-      {(buildingLoading || profileLoading) && (
-        <Card>
-          <CardHeader>
-            <Skeleton className="h-6 w-48" />
-            <Skeleton className="h-4 w-64 mt-2" />
-          </CardHeader>
-          <CardContent>
-            <Skeleton className="h-10 w-full" />
-          </CardContent>
-        </Card>
-      )}
+      {/* Building Info Card */}
+      {renderRoleBasedContent()}
 
-      {/* Error State */}
-      {buildingError && (
-        <Card className="border-destructive">
-          <CardHeader>
-            <CardTitle className="text-destructive">Hata</CardTitle>
-            <CardDescription>
-              Bina bilgileri yüklenirken bir hata oluştu
-            </CardDescription>
+      {/* Statistics Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <Card className="hover:shadow-lg transition-shadow">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Toplam Üyeler</CardTitle>
+            <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-muted-foreground">
-              {buildingError instanceof Error ? buildingError.message : 'Bilinmeyen bir hata oluştu'}
+            <div className="text-2xl font-bold">{totalMembers}</div>
+            <p className="text-xs text-muted-foreground">
+              Aktif kullanıcı sayısı
             </p>
           </CardContent>
         </Card>
+
+        <Card className="hover:shadow-lg transition-shadow">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Aktif Davet Kodları</CardTitle>
+            <Activity className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{activeInviteCodes}</div>
+            <p className="text-xs text-muted-foreground">
+              Kullanılabilir davet kodu
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card className="hover:shadow-lg transition-shadow">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Kullanılan Kodlar</CardTitle>
+            <TrendingUp className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{usedInviteCodes}</div>
+            <p className="text-xs text-muted-foreground">
+              Toplam {totalInviteCodes} koddan
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Invite Code Management - Only for BINA_SAHIBI and YETKILI */}
+      {canCreateInviteCodes && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Plus className="h-5 w-5" />
+              Davet Kodu Yönetimi
+            </CardTitle>
+            <CardDescription>
+              Yeni kullanıcılar için davet kodları oluşturun ve yönetin
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <InviteCodePanel />
+          </CardContent>
+        </Card>
       )}
 
-      {/* Conditional Rendering: Onboarding vs Dashboard */}
-      {!buildingLoading && !profileLoading && profileFetched && (
-        <>
-          {!hasBuilding ? (
-            renderOnboardingSection()
-          ) : (
-            <>
-              {/* Building Status Section */}
-              {building && renderRoleBasedContent()}
-
-              {/* Invite Code Panel - Only for BINA_SAHIBI and YETKILI */}
-              {canCreateInviteCodes && <InviteCodePanel />}
-
-              {/* Stats Grid */}
-              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-                <Card className="hover:shadow-md transition-shadow">
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Bina</CardTitle>
-                    <Building2 className="h-4 w-4 text-muted-foreground" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">1</div>
-                    <p className="text-xs text-muted-foreground">Aktif bina</p>
-                  </CardContent>
-                </Card>
-
-                <Card className="hover:shadow-md transition-shadow">
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Kullanıcılar</CardTitle>
-                    <Users className="h-4 w-4 text-muted-foreground" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">{totalMembers}</div>
-                    <p className="text-xs text-muted-foreground">Kayıtlı kullanıcı</p>
-                    {usedInviteCodes > 0 && (
-                      <div className="flex items-center gap-1 mt-1">
-                        <TrendingUp className="h-3 w-3 text-green-600" />
-                        <span className="text-xs text-green-600">+{usedInviteCodes} yeni</span>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-
-                <Card className="hover:shadow-md transition-shadow">
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Davet Kodları</CardTitle>
-                    <Activity className="h-4 w-4 text-muted-foreground" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">{activeInviteCodes}</div>
-                    <p className="text-xs text-muted-foreground">Aktif kod</p>
-                    {totalInviteCodes > 0 && (
-                      <p className="text-xs text-muted-foreground mt-1">
-                        {totalInviteCodes} toplam
-                      </p>
-                    )}
-                  </CardContent>
-                </Card>
-
-                <Card className="hover:shadow-md transition-shadow">
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Sistem Durumu</CardTitle>
-                    <HomeIcon className="h-4 w-4 text-muted-foreground" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold text-green-600">✓</div>
-                    <p className="text-xs text-muted-foreground">Tüm sistemler çalışıyor</p>
-                  </CardContent>
-                </Card>
-              </div>
-
-              {/* Quick Actions */}
-              {canCreateInviteCodes && (
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-lg">Hızlı İşlemler</CardTitle>
-                    <CardDescription>
-                      Sık kullanılan işlemlere hızlı erişim
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid gap-4 md:grid-cols-2">
-                      <Button variant="outline" className="h-auto py-4 justify-start" asChild>
-                        <a href="/building-members">
-                          <Users className="mr-3 h-5 w-5" />
-                          <div className="text-left">
-                            <p className="font-medium">Üyeleri Görüntüle</p>
-                            <p className="text-xs text-muted-foreground">Tüm bina üyelerini listele</p>
-                          </div>
-                        </a>
-                      </Button>
-                      <Button variant="outline" className="h-auto py-4 justify-start" asChild>
-                        <a href="/announcements">
-                          <Bell className="mr-3 h-5 w-5" />
-                          <div className="text-left">
-                            <p className="font-medium">Duyurular</p>
-                            <p className="text-xs text-muted-foreground">Duyuruları yönet</p>
-                          </div>
-                        </a>
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
-            </>
-          )}
-        </>
+      {/* Building Create Form Modal */}
+      {showCreateForm && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <Card className="w-full max-w-md">
+            <CardHeader>
+              <CardTitle>Yeni Bina Oluştur</CardTitle>
+              <CardDescription>
+                Bina bilgilerini girin
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <BuildingCreateForm onSuccess={handleCreateSuccess} />
+              <Button
+                variant="outline"
+                onClick={() => setShowCreateForm(false)}
+                className="w-full mt-4"
+              >
+                İptal
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
       )}
     </div>
   );

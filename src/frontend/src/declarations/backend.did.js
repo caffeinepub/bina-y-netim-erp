@@ -13,12 +13,18 @@ export const UserRole = IDL.Variant({
   'user' : IDL.Null,
   'guest' : IDL.Null,
 });
+export const Time = IDL.Int;
+export const Daire = IDL.Record({
+  'olusturmaTarihi' : Time,
+  'daireId' : IDL.Text,
+  'binaId' : IDL.Nat,
+  'daireAdi' : IDL.Text,
+});
 export const Role = IDL.Variant({
   'yetkili' : IDL.Null,
   'sakin' : IDL.Null,
   'binaSahibi' : IDL.Null,
 });
-export const Time = IDL.Int;
 export const DavetKodu = IDL.Record({
   'kod' : IDL.Text,
   'rol' : Role,
@@ -29,13 +35,33 @@ export const DavetKodu = IDL.Record({
   'kullanimTarihi' : IDL.Opt(Time),
   'binaId' : IDL.Nat,
 });
+export const Duyuru = IDL.Record({
+  'olusturmaTarihi' : Time,
+  'baslik' : IDL.Text,
+  'duyuruId' : IDL.Text,
+  'aciklama' : IDL.Text,
+  'olusturanPrincipal' : IDL.Principal,
+  'binaId' : IDL.Nat,
+});
+export const RSVP = IDL.Record({
+  'name' : IDL.Text,
+  'inviteCode' : IDL.Text,
+  'timestamp' : Time,
+  'attending' : IDL.Bool,
+});
 export const UserProfile = IDL.Record({
   'name' : IDL.Text,
   'role' : Role,
   'loginCount' : IDL.Nat,
   'firstLogin' : Time,
   'lastLogin' : Time,
+  'daireId' : IDL.Opt(IDL.Text),
   'binaId' : IDL.Opt(IDL.Nat),
+});
+export const InviteCode = IDL.Record({
+  'created' : Time,
+  'code' : IDL.Text,
+  'used' : IDL.Bool,
 });
 export const Bina = IDL.Record({
   'olusturulmaTarihi' : Time,
@@ -43,16 +69,33 @@ export const Bina = IDL.Record({
   'olusturanPrincipal' : IDL.Principal,
   'binaId' : IDL.Nat,
 });
+export const UserProfil = IDL.Record({
+  'principal' : IDL.Principal,
+  'name' : IDL.Text,
+  'role' : Role,
+  'loginCount' : IDL.Nat,
+  'firstLogin' : Time,
+  'lastLogin' : Time,
+  'daireId' : IDL.Opt(IDL.Text),
+  'binaId' : IDL.Opt(IDL.Nat),
+});
 
 export const idlService = IDL.Service({
   '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
   'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
   'binaOlustur' : IDL.Func([IDL.Text], [IDL.Nat], []),
+  'daireOlustur' : IDL.Func([IDL.Text], [IDL.Text], []),
+  'daireleriListele' : IDL.Func([], [IDL.Vec(Daire)], ['query']),
   'davetKodlariniListele' : IDL.Func([], [IDL.Vec(DavetKodu)], ['query']),
   'davetKoduIleKayitOl' : IDL.Func([IDL.Text], [IDL.Text], []),
   'davetKoduOlustur' : IDL.Func([Role], [IDL.Text], []),
+  'duyuruOlustur' : IDL.Func([IDL.Text, IDL.Text], [Duyuru], []),
+  'duyurulariListele' : IDL.Func([], [IDL.Vec(Duyuru)], ['query']),
+  'generateInviteCode' : IDL.Func([], [IDL.Text], []),
+  'getAllRSVPs' : IDL.Func([], [IDL.Vec(RSVP)], ['query']),
   'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
   'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
+  'getInviteCodes' : IDL.Func([], [IDL.Vec(InviteCode)], ['query']),
   'getUserProfile' : IDL.Func(
       [IDL.Principal],
       [IDL.Opt(UserProfile)],
@@ -60,7 +103,9 @@ export const idlService = IDL.Service({
     ),
   'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
   'kullaniciBinasiniGetir' : IDL.Func([], [IDL.Opt(Bina)], ['query']),
+  'kullanicilariListele' : IDL.Func([], [IDL.Vec(UserProfil)], ['query']),
   'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
+  'submitRSVP' : IDL.Func([IDL.Text, IDL.Bool, IDL.Text], [], []),
 });
 
 export const idlInitArgs = [];
@@ -71,12 +116,18 @@ export const idlFactory = ({ IDL }) => {
     'user' : IDL.Null,
     'guest' : IDL.Null,
   });
+  const Time = IDL.Int;
+  const Daire = IDL.Record({
+    'olusturmaTarihi' : Time,
+    'daireId' : IDL.Text,
+    'binaId' : IDL.Nat,
+    'daireAdi' : IDL.Text,
+  });
   const Role = IDL.Variant({
     'yetkili' : IDL.Null,
     'sakin' : IDL.Null,
     'binaSahibi' : IDL.Null,
   });
-  const Time = IDL.Int;
   const DavetKodu = IDL.Record({
     'kod' : IDL.Text,
     'rol' : Role,
@@ -87,13 +138,33 @@ export const idlFactory = ({ IDL }) => {
     'kullanimTarihi' : IDL.Opt(Time),
     'binaId' : IDL.Nat,
   });
+  const Duyuru = IDL.Record({
+    'olusturmaTarihi' : Time,
+    'baslik' : IDL.Text,
+    'duyuruId' : IDL.Text,
+    'aciklama' : IDL.Text,
+    'olusturanPrincipal' : IDL.Principal,
+    'binaId' : IDL.Nat,
+  });
+  const RSVP = IDL.Record({
+    'name' : IDL.Text,
+    'inviteCode' : IDL.Text,
+    'timestamp' : Time,
+    'attending' : IDL.Bool,
+  });
   const UserProfile = IDL.Record({
     'name' : IDL.Text,
     'role' : Role,
     'loginCount' : IDL.Nat,
     'firstLogin' : Time,
     'lastLogin' : Time,
+    'daireId' : IDL.Opt(IDL.Text),
     'binaId' : IDL.Opt(IDL.Nat),
+  });
+  const InviteCode = IDL.Record({
+    'created' : Time,
+    'code' : IDL.Text,
+    'used' : IDL.Bool,
   });
   const Bina = IDL.Record({
     'olusturulmaTarihi' : Time,
@@ -101,16 +172,33 @@ export const idlFactory = ({ IDL }) => {
     'olusturanPrincipal' : IDL.Principal,
     'binaId' : IDL.Nat,
   });
+  const UserProfil = IDL.Record({
+    'principal' : IDL.Principal,
+    'name' : IDL.Text,
+    'role' : Role,
+    'loginCount' : IDL.Nat,
+    'firstLogin' : Time,
+    'lastLogin' : Time,
+    'daireId' : IDL.Opt(IDL.Text),
+    'binaId' : IDL.Opt(IDL.Nat),
+  });
   
   return IDL.Service({
     '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
     'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
     'binaOlustur' : IDL.Func([IDL.Text], [IDL.Nat], []),
+    'daireOlustur' : IDL.Func([IDL.Text], [IDL.Text], []),
+    'daireleriListele' : IDL.Func([], [IDL.Vec(Daire)], ['query']),
     'davetKodlariniListele' : IDL.Func([], [IDL.Vec(DavetKodu)], ['query']),
     'davetKoduIleKayitOl' : IDL.Func([IDL.Text], [IDL.Text], []),
     'davetKoduOlustur' : IDL.Func([Role], [IDL.Text], []),
+    'duyuruOlustur' : IDL.Func([IDL.Text, IDL.Text], [Duyuru], []),
+    'duyurulariListele' : IDL.Func([], [IDL.Vec(Duyuru)], ['query']),
+    'generateInviteCode' : IDL.Func([], [IDL.Text], []),
+    'getAllRSVPs' : IDL.Func([], [IDL.Vec(RSVP)], ['query']),
     'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
     'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
+    'getInviteCodes' : IDL.Func([], [IDL.Vec(InviteCode)], ['query']),
     'getUserProfile' : IDL.Func(
         [IDL.Principal],
         [IDL.Opt(UserProfile)],
@@ -118,7 +206,9 @@ export const idlFactory = ({ IDL }) => {
       ),
     'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
     'kullaniciBinasiniGetir' : IDL.Func([], [IDL.Opt(Bina)], ['query']),
+    'kullanicilariListele' : IDL.Func([], [IDL.Vec(UserProfil)], ['query']),
     'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
+    'submitRSVP' : IDL.Func([IDL.Text, IDL.Bool, IDL.Text], [], []),
   });
 };
 

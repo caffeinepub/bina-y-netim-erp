@@ -4,7 +4,7 @@ import { useInternetIdentity } from '../hooks/useInternetIdentity';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Building2, Loader2, UserCog, Users } from 'lucide-react';
-import { storeSessionParameter } from '@/utils/urlParams';
+import { storeOnboardingFlow } from '@/utils/urlParams';
 
 export default function Login() {
   const { login, identity, isLoggingIn } = useInternetIdentity();
@@ -19,9 +19,13 @@ export default function Login() {
   }, [identity, navigate]);
 
   const handleLogin = async (flowType: 'building-owner' | 'authority' | 'resident') => {
-    // Store the selected onboarding flow before authentication
-    storeSessionParameter('onboardingFlow', flowType);
+    console.log('Login: Selected onboarding flow:', flowType);
     
+    // Store the selected onboarding flow before authentication
+    storeOnboardingFlow(flowType);
+    console.log('Login: Stored onboarding flow in session storage');
+    
+    console.log('Login: Initiating Internet Identity authentication');
     try {
       await login();
     } catch (error: any) {

@@ -1,4 +1,85 @@
 {
   "kind": "feature_evidence_report",
-  "features": []
+  "features": [
+    {
+      "featureId": "feature-create-a-visual-apartment-layout-grid-component-dairegorunumu-tsx-in-the-frontend-that-displays-all-apartments-in-an-interactive-grid-card-layout-showing-apartment-name-number-daireadi-on-each-card",
+      "featureTitle": "Create a visual apartment layout grid component (DaireGorunumu.tsx) in the frontend that displays all apartments in an interactive grid/card layout, showing apartment name/number (daireAdi) on each card",
+      "files": [
+        "frontend/src/components/DaireGorunumu.tsx"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "authorization@4.0.0",
+        "invite-links@3.0.0"
+      ],
+      "testIds": [
+        "REQ-79"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-integrate-the-dairegorunumu-component-into-the-ownerdashboard-page-frontend-src-pages-ownerdashboard-tsx-as-a-new-section-titled-daire-g-r-n-m-positioned-after-the-existing-apartment-management-section",
+      "featureTitle": "Integrate the DaireGorunumu component into the OwnerDashboard page (frontend/src/pages/OwnerDashboard.tsx) as a new section titled 'Daire Görünümü' positioned after the existing apartment management section",
+      "files": [
+        "frontend/src/pages/OwnerDashboard.tsx"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "authorization@4.0.0",
+        "invite-links@3.0.0"
+      ],
+      "testIds": [
+        "REQ-80"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-add-visual-indicators-to-apartment-cards-showing-occupancy-status-display-a-subtle-badge-or-icon-indicating-whether-the-apartment-is-assigned-to-a-user-based-on-checking-if-any-user-s-daireid-matches-the-apartment-s-daireid",
+      "featureTitle": "Add visual indicators to apartment cards showing occupancy status: display a subtle badge or icon indicating whether the apartment is assigned to a user (based on checking if any user's daireId matches the apartment's daireId)",
+      "files": [
+        "frontend/src/components/DaireGorunumu.tsx"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "authorization@4.0.0",
+        "invite-links@3.0.0"
+      ],
+      "testIds": [
+        "REQ-81"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-implement-hover-interactions-on-apartment-cards-that-display-additional-information-in-a-tooltip-or-popover-including-creation-date-olusturmatarihi-formatted-in-turkish-locale",
+      "featureTitle": "Implement hover interactions on apartment cards that display additional information in a tooltip or popover, including creation date (olusturmaTarihi) formatted in Turkish locale",
+      "files": [
+        "frontend/src/components/DaireGorunumu.tsx"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "authorization@4.0.0",
+        "invite-links@3.0.0"
+      ],
+      "testIds": [
+        "REQ-82"
+      ],
+      "confidence": "high"
+    }
+  ]
 }

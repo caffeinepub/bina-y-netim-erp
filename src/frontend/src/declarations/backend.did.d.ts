@@ -16,6 +16,12 @@ export interface Bina {
   'olusturanPrincipal' : Principal,
   'binaId' : bigint,
 }
+export interface Daire {
+  'olusturmaTarihi' : Time,
+  'daireId' : string,
+  'binaId' : bigint,
+  'daireAdi' : string,
+}
 export interface DavetKodu {
   'kod' : string,
   'rol' : Role,
@@ -26,16 +32,46 @@ export interface DavetKodu {
   'kullanimTarihi' : [] | [Time],
   'binaId' : bigint,
 }
+export interface Duyuru {
+  'olusturmaTarihi' : Time,
+  'baslik' : string,
+  'duyuruId' : string,
+  'aciklama' : string,
+  'olusturanPrincipal' : Principal,
+  'binaId' : bigint,
+}
+export interface InviteCode {
+  'created' : Time,
+  'code' : string,
+  'used' : boolean,
+}
+export interface RSVP {
+  'name' : string,
+  'inviteCode' : string,
+  'timestamp' : Time,
+  'attending' : boolean,
+}
 export type Role = { 'yetkili' : null } |
   { 'sakin' : null } |
   { 'binaSahibi' : null };
 export type Time = bigint;
+export interface UserProfil {
+  'principal' : Principal,
+  'name' : string,
+  'role' : Role,
+  'loginCount' : bigint,
+  'firstLogin' : Time,
+  'lastLogin' : Time,
+  'daireId' : [] | [string],
+  'binaId' : [] | [bigint],
+}
 export interface UserProfile {
   'name' : string,
   'role' : Role,
   'loginCount' : bigint,
   'firstLogin' : Time,
   'lastLogin' : Time,
+  'daireId' : [] | [string],
   'binaId' : [] | [bigint],
 }
 export type UserRole = { 'admin' : null } |
@@ -45,15 +81,24 @@ export interface _SERVICE {
   '_initializeAccessControlWithSecret' : ActorMethod<[string], undefined>,
   'assignCallerUserRole' : ActorMethod<[Principal, UserRole], undefined>,
   'binaOlustur' : ActorMethod<[string], bigint>,
+  'daireOlustur' : ActorMethod<[string], string>,
+  'daireleriListele' : ActorMethod<[], Array<Daire>>,
   'davetKodlariniListele' : ActorMethod<[], Array<DavetKodu>>,
   'davetKoduIleKayitOl' : ActorMethod<[string], string>,
   'davetKoduOlustur' : ActorMethod<[Role], string>,
+  'duyuruOlustur' : ActorMethod<[string, string], Duyuru>,
+  'duyurulariListele' : ActorMethod<[], Array<Duyuru>>,
+  'generateInviteCode' : ActorMethod<[], string>,
+  'getAllRSVPs' : ActorMethod<[], Array<RSVP>>,
   'getCallerUserProfile' : ActorMethod<[], [] | [UserProfile]>,
   'getCallerUserRole' : ActorMethod<[], UserRole>,
+  'getInviteCodes' : ActorMethod<[], Array<InviteCode>>,
   'getUserProfile' : ActorMethod<[Principal], [] | [UserProfile]>,
   'isCallerAdmin' : ActorMethod<[], boolean>,
   'kullaniciBinasiniGetir' : ActorMethod<[], [] | [Bina]>,
+  'kullanicilariListele' : ActorMethod<[], Array<UserProfil>>,
   'saveCallerUserProfile' : ActorMethod<[UserProfile], undefined>,
+  'submitRSVP' : ActorMethod<[string, boolean, string], undefined>,
 }
 export declare const idlService: IDL.ServiceClass;
 export declare const idlInitArgs: IDL.Type[];

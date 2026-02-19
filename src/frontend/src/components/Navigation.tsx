@@ -3,16 +3,20 @@ import { useInternetIdentity } from '../hooks/useInternetIdentity';
 import { useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Home, LayoutDashboard, Users, UserCircle, Menu, LogOut, Bell, UsersRound } from 'lucide-react';
+import { Home, LayoutDashboard, Users, UserCircle, Menu, LogOut, Bell, UsersRound, Shield } from 'lucide-react';
 import { useState } from 'react';
+import { useGetCallerUserProfile } from '@/hooks/useQueries';
+import { Role } from '@/backend';
 
 export default function Navigation() {
   const location = useLocation();
   const { clear, identity } = useInternetIdentity();
   const queryClient = useQueryClient();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { data: userProfile, isLoading: profileLoading } = useGetCallerUserProfile();
 
   const isAuthenticated = !!identity;
+  const userRole = userProfile?.role;
 
   const handleLogout = async () => {
     await clear();
@@ -20,18 +24,83 @@ export default function Navigation() {
     setMobileMenuOpen(false);
   };
 
-  const menuItems = [
-    { path: '/dashboard', label: 'Panel', icon: LayoutDashboard },
-    { path: '/', label: 'Ana Sayfa', icon: Home },
-    { path: '/announcements', label: 'Duyurular', icon: Bell },
-    { path: '/building-members', label: 'Üyeler', icon: UsersRound },
-    { path: '/users', label: 'Kullanıcılar', icon: Users },
-    { path: '/profile', label: 'Profil', icon: UserCircle },
+  // Define all possible menu items
+  const allMenuItems = [
+    { 
+      path: '/owner-dashboard', 
+      label: 'Panel', 
+      icon: LayoutDashboard,
+      roles: [Role.binaSahibi]
+    },
+    { 
+      path: '/manager-dashboard', 
+      label: 'Panel', 
+      icon: LayoutDashboard,
+      roles: [Role.yetkili]
+    },
+    { 
+      path: '/resident-dashboard', 
+      label: 'Panel', 
+      icon: LayoutDashboard,
+      roles: [Role.sakin]
+    },
+    { 
+      path: '/', 
+      label: 'Ana Sayfa', 
+      icon: Home,
+      roles: [Role.binaSahibi, Role.yetkili, Role.sakin]
+    },
+    { 
+      path: '/announcements', 
+      label: 'Duyurular', 
+      icon: Bell,
+      roles: [Role.binaSahibi, Role.yetkili, Role.sakin]
+    },
+    { 
+      path: '/building-members', 
+      label: 'Üyeler', 
+      icon: UsersRound,
+      roles: [Role.binaSahibi, Role.yetkili]
+    },
+    { 
+      path: '/users', 
+      label: 'Kullanıcılar', 
+      icon: Users,
+      roles: [Role.binaSahibi]
+    },
+    { 
+      path: '/profile', 
+      label: 'Profil', 
+      icon: UserCircle,
+      roles: [Role.binaSahibi, Role.yetkili, Role.sakin]
+    },
   ];
+
+  // Filter menu items based on user role
+  const menuItems = profileLoading || !userRole 
+    ? [] 
+    : allMenuItems.filter(item => item.roles.includes(userRole));
 
   const isActive = (path: string) => {
     return location.pathname === path;
   };
+
+  if (profileLoading) {
+    return (
+      <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="container mx-auto px-4">
+          <div className="flex h-16 items-center justify-between">
+            <Link to="/" className="flex items-center space-x-2">
+              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+                <Home className="w-5 h-5 text-primary-foreground" />
+              </div>
+              <span className="font-bold text-xl">Bina Yönetim</span>
+            </Link>
+          </div>
+        </div>
+      </nav>
+    );
+  }
 
   return (
     <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">

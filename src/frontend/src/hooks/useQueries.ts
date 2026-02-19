@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useActor } from './useActor';
 import { Principal } from '@dfinity/principal';
-import type { UserProfile, Bina, DavetKodu, Role } from '../backend';
+import type { UserProfile, Bina, DavetKodu, Role, UserProfil, Daire, Duyuru } from '../backend';
 
 export function useGetUserProfile(principal: Principal | null) {
   const { actor, isFetching } = useActor();
@@ -128,5 +128,89 @@ export function useSaveCallerUserProfile() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['currentUserProfile'] });
     },
+  });
+}
+
+export function useListBuildingUsers() {
+  const { actor, isFetching } = useActor();
+
+  return useQuery<UserProfil[]>({
+    queryKey: ['buildingUsers'],
+    queryFn: async () => {
+      if (!actor) throw new Error('Actor not available');
+      return actor.kullanicilariListele();
+    },
+    enabled: !!actor && !isFetching,
+  });
+}
+
+export function useCreateApartment() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (daireAdi: string) => {
+      if (!actor) throw new Error('Actor not available');
+      return actor.daireOlustur(daireAdi);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['apartments'] });
+    },
+  });
+}
+
+export function useListApartments() {
+  const { actor, isFetching } = useActor();
+
+  return useQuery<Daire[]>({
+    queryKey: ['apartments'],
+    queryFn: async () => {
+      if (!actor) throw new Error('Actor not available');
+      return actor.daireleriListele();
+    },
+    enabled: !!actor && !isFetching,
+  });
+}
+
+export function useCreateAnnouncement() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ baslik, aciklama }: { baslik: string; aciklama: string }) => {
+      if (!actor) throw new Error('Actor not available');
+      return actor.duyuruOlustur(baslik, aciklama);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['announcements'] });
+    },
+  });
+}
+
+export function useListAnnouncements() {
+  const { actor, isFetching } = useActor();
+
+  return useQuery<Duyuru[]>({
+    queryKey: ['announcements'],
+    queryFn: async () => {
+      if (!actor) throw new Error('Actor not available');
+      return actor.duyurulariListele();
+    },
+    enabled: !!actor && !isFetching,
+  });
+}
+
+// Placeholder hook for issues - backend functionality not yet implemented
+export function useListIssues() {
+  const { actor, isFetching } = useActor();
+
+  return useQuery<any[]>({
+    queryKey: ['issues'],
+    queryFn: async () => {
+      // Backend does not have arizalariListele function yet
+      // Returning empty array as placeholder
+      return [];
+    },
+    enabled: !!actor && !isFetching,
   });
 }

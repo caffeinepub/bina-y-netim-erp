@@ -10,7 +10,11 @@ import { Role } from '@/backend';
 import { toast } from 'sonner';
 import { getRoleDisplayName } from '@/utils/roleTranslations';
 
-export default function InviteCodePanel() {
+interface InviteCodePanelProps {
+  allowedRoles?: Role[];
+}
+
+export default function InviteCodePanel({ allowedRoles }: InviteCodePanelProps) {
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
   const [selectedRole, setSelectedRole] = useState<Role | null>(null);
 
@@ -22,12 +26,18 @@ export default function InviteCodePanel() {
   const isBinaSahibi = userRole === Role.binaSahibi;
   const isYetkili = userRole === Role.yetkili;
 
-  // Determine available roles based on user's role
-  const availableRoles: Role[] = [];
-  if (isBinaSahibi) {
-    availableRoles.push(Role.binaSahibi, Role.yetkili, Role.sakin);
-  } else if (isYetkili) {
-    availableRoles.push(Role.sakin);
+  // Determine available roles based on user's role and allowedRoles prop
+  let availableRoles: Role[] = [];
+  if (allowedRoles) {
+    // If allowedRoles prop is provided, use it
+    availableRoles = allowedRoles;
+  } else {
+    // Otherwise, determine based on user role
+    if (isBinaSahibi) {
+      availableRoles.push(Role.binaSahibi, Role.yetkili, Role.sakin);
+    } else if (isYetkili) {
+      availableRoles.push(Role.sakin);
+    }
   }
 
   const handleCreateCode = async () => {
@@ -101,149 +111,123 @@ export default function InviteCodePanel() {
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Users className="h-5 w-5 text-primary" />
-          Davet Kodu Yönetimi
-        </CardTitle>
-        <CardDescription>
-          Yeni kullanıcıları binaya davet etmek için kod oluşturun
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        {/* Create New Code Section */}
-        <div className="space-y-4">
-          <div>
-            <h3 className="text-sm font-medium mb-3">Yeni Davet Kodu Oluştur</h3>
-            <div className="grid gap-3 md:grid-cols-3">
-              {availableRoles.map((role) => (
-                <Button
-                  key={role}
-                  variant={selectedRole === role ? 'default' : 'outline'}
-                  className="h-auto py-4 justify-start"
-                  onClick={() => setSelectedRole(role)}
-                >
-                  <div className="flex items-center gap-3 w-full">
-                    {getRoleIcon(role)}
-                    <div className="text-left flex-1">
-                      <p className="font-medium text-sm">{getRoleDisplayName(role)}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {role === Role.binaSahibi && 'Tam yetki'}
-                        {role === Role.yetkili && 'Yönetim yetkisi'}
-                        {role === Role.sakin && 'Standart kullanıcı'}
-                      </p>
-                    </div>
+    <div className="space-y-6">
+      {/* Create New Code Section */}
+      <div className="space-y-4">
+        <div>
+          <h3 className="text-sm font-medium mb-3">Yeni Davet Kodu Oluştur</h3>
+          <div className="grid gap-3 md:grid-cols-3">
+            {availableRoles.map((role) => (
+              <Button
+                key={role}
+                variant={selectedRole === role ? 'default' : 'outline'}
+                className="h-auto py-4 justify-start"
+                onClick={() => setSelectedRole(role)}
+              >
+                <div className="flex items-center gap-3 w-full">
+                  {getRoleIcon(role)}
+                  <div className="text-left flex-1">
+                    <p className="font-medium text-sm">{getRoleDisplayName(role)}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {role === Role.binaSahibi && 'Tam yetki'}
+                      {role === Role.yetkili && 'Yönetim yetkisi'}
+                      {role === Role.sakin && 'Standart kullanıcı'}
+                    </p>
                   </div>
-                </Button>
-              ))}
-            </div>
+                </div>
+              </Button>
+            ))}
           </div>
-
-          <Button
-            onClick={handleCreateCode}
-            disabled={!selectedRole || createInviteCode.isPending}
-            className="w-full"
-            size="lg"
-          >
-            {createInviteCode.isPending ? (
-              <>
-                <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
-                Oluşturuluyor...
-              </>
-            ) : (
-              <>
-                <Plus className="mr-2 h-4 w-4" />
-                Davet Kodu Oluştur
-              </>
-            )}
-          </Button>
         </div>
 
-        {/* Existing Codes Section */}
-        <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <h3 className="text-sm font-medium">Mevcut Davet Kodları</h3>
-            {inviteCodes && inviteCodes.length > 0 && (
-              <Badge variant="secondary">
-                {inviteCodes.length} Kod
-              </Badge>
-            )}
-          </div>
+        <Button
+          onClick={handleCreateCode}
+          disabled={!selectedRole || createInviteCode.isPending}
+          className="w-full"
+        >
+          <Plus className="h-4 w-4 mr-2" />
+          {createInviteCode.isPending ? 'Oluşturuluyor...' : 'Davet Kodu Oluştur'}
+        </Button>
+      </div>
 
-          {codesLoading ? (
-            <div className="space-y-3">
-              <Skeleton className="h-24 w-full" />
-              <Skeleton className="h-24 w-full" />
-            </div>
-          ) : inviteCodes && inviteCodes.length > 0 ? (
-            <div className="space-y-3 max-h-96 overflow-y-auto">
-              {inviteCodes.map((code) => (
-                <Card key={code.kod} className={code.kullanildiMi ? 'opacity-60' : ''}>
-                  <CardContent className="p-4">
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="flex-1 space-y-2">
-                        <div className="flex items-center gap-2">
-                          <code className="text-sm font-mono bg-muted px-2 py-1 rounded">
-                            {code.kod}
-                          </code>
-                          <Badge variant="outline" className={getRoleColor(code.rol)}>
-                            {getRoleIcon(code.rol)}
-                            <span className="ml-1">{getRoleDisplayName(code.rol)}</span>
+      {/* Existing Codes Section */}
+      <div className="space-y-3">
+        <h3 className="text-sm font-medium">Mevcut Davet Kodları</h3>
+        
+        {codesLoading ? (
+          <div className="space-y-2">
+            <Skeleton className="h-20 w-full" />
+            <Skeleton className="h-20 w-full" />
+          </div>
+        ) : inviteCodes && inviteCodes.length > 0 ? (
+          <div className="space-y-2 max-h-96 overflow-y-auto">
+            {inviteCodes.map((code) => (
+              <Card key={code.kod} className={code.kullanildiMi ? 'opacity-60' : ''}>
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between gap-4">
+                    <div className="flex-1 space-y-2">
+                      <div className="flex items-center gap-2">
+                        <Badge className={getRoleColor(code.rol)}>
+                          {getRoleIcon(code.rol)}
+                          <span className="ml-1">{getRoleDisplayName(code.rol)}</span>
+                        </Badge>
+                        {code.kullanildiMi && (
+                          <Badge variant="secondary" className="text-xs">
+                            Kullanıldı
                           </Badge>
-                          {code.kullanildiMi && (
-                            <Badge variant="secondary" className="text-xs">
-                              Kullanıldı
-                            </Badge>
-                          )}
-                        </div>
-
-                        <div className="flex flex-wrap gap-3 text-xs text-muted-foreground">
-                          <div className="flex items-center gap-1">
-                            <Calendar className="h-3 w-3" />
-                            <span>
-                              {new Date(Number(code.olusturmaTarihi) / 1000000).toLocaleDateString('tr-TR')}
-                            </span>
-                          </div>
-                          {code.kullanildiMi && code.kullanimTarihi && (
-                            <div className="flex items-center gap-1">
-                              <User className="h-3 w-3" />
-                              <span>
-                                Kullanım: {new Date(Number(code.kullanimTarihi) / 1000000).toLocaleDateString('tr-TR')}
-                              </span>
-                            </div>
-                          )}
-                        </div>
+                        )}
                       </div>
-
-                      {!code.kullanildiMi && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleCopyCode(code.kod)}
-                          className="shrink-0"
-                        >
-                          {copiedCode === code.kod ? (
-                            <Check className="h-4 w-4 text-green-600" />
-                          ) : (
-                            <Copy className="h-4 w-4" />
-                          )}
-                        </Button>
-                      )}
+                      
+                      <div className="font-mono text-sm bg-muted px-3 py-2 rounded">
+                        {code.kod}
+                      </div>
+                      
+                      <div className="flex flex-wrap gap-3 text-xs text-muted-foreground">
+                        <span className="flex items-center gap-1">
+                          <Calendar className="h-3 w-3" />
+                          {new Date(Number(code.olusturmaTarihi) / 1000000).toLocaleDateString('tr-TR')}
+                        </span>
+                        {code.kullanildiMi && code.kullananPrincipal && (
+                          <span className="flex items-center gap-1">
+                            <User className="h-3 w-3" />
+                            {code.kullananPrincipal.toString().slice(0, 15)}...
+                          </span>
+                        )}
+                      </div>
                     </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-8 text-muted-foreground border rounded-lg bg-muted/20">
-              <Users className="h-12 w-12 mx-auto mb-3 opacity-50" />
-              <p className="text-sm">Henüz davet kodu oluşturulmadı</p>
-              <p className="text-xs mt-1">Yukarıdan yeni bir kod oluşturabilirsiniz</p>
-            </div>
-          )}
-        </div>
-      </CardContent>
-    </Card>
+                    
+                    {!code.kullanildiMi && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleCopyCode(code.kod)}
+                        className="shrink-0"
+                      >
+                        {copiedCode === code.kod ? (
+                          <>
+                            <Check className="h-4 w-4 mr-1" />
+                            Kopyalandı
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="h-4 w-4 mr-1" />
+                            Kopyala
+                          </>
+                        )}
+                      </Button>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-8 text-muted-foreground border rounded-lg bg-muted/20">
+            <Users className="h-12 w-12 mx-auto mb-3 opacity-50" />
+            <p className="text-sm">Henüz davet kodu oluşturulmamış</p>
+          </div>
+        )}
+      </div>
+    </div>
   );
 }

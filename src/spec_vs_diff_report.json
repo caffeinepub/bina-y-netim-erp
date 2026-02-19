@@ -1,60 +1,30 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-18T22:37:08.672Z",
-  "summary": "The diff implements security fixes and UI improvements without any explicitly documented requirements in the BuildRequest. The changes include a security fix preventing users from creating multiple buildings, enhanced invite code management UI, a new Building Members page showing member statistics, improved Home page dashboard with real-time statistics, and URL parameter utility functions for onboarding flow management.",
+  "generatedAt": "2026-02-19T00:00:05.047Z",
+  "summary": "The implementation successfully delivers all four requirements (REQ-79, REQ-80, REQ-81, REQ-82). DaireGorunumu.tsx was created with responsive grid layout, occupancy status badges, hover interactions with tooltips, and Turkish date formatting. The component was integrated into OwnerDashboard.tsx as a new section. All acceptance criteria appear to be met based on the diff evidence.",
   "missing_requirements": [],
   "hallucinated_features": [
     {
-      "description": "Security fix preventing users from creating multiple buildings (checking for existing binaId before allowing binaOlustur)",
-      "reason": "No requirement specified this security enhancement in the BuildRequest",
+      "description": "Added occupant name display on apartment cards showing which user is assigned to occupied apartments",
+      "reason": "REQ-81 only specified showing occupancy status (Boş/Dolu) with badges/icons. Displaying the actual occupant name was not requested in any requirement",
       "evidence": [
-        "backend/main.mo"
+        "frontend/src/components/DaireGorunumu.tsx"
       ]
     },
     {
-      "description": "Security enforcement of immutable binaId and role fields in saveCallerUserProfile to prevent privilege escalation",
-      "reason": "No requirement specified this security hardening feature in the BuildRequest",
+      "description": "Implemented getOccupantName utility function to fetch and display user names on apartment cards",
+      "reason": "The BuildRequest did not ask for displaying user names or user assignment information within apartment cards. This was explicitly listed in Non-goals: User assignment interface within the apartment cards",
       "evidence": [
-        "backend/main.mo"
-      ]
-    },
-    {
-      "description": "Enhanced InviteCodePanel UI with role-based filtering, descriptive cards, improved code display with status badges and timestamps",
-      "reason": "No requirement specified these UI enhancements in the BuildRequest",
-      "evidence": [
-        "frontend/src/components/InviteCodePanel.tsx"
-      ]
-    },
-    {
-      "description": "New BuildingMembers page displaying member statistics calculated from invite codes including role distribution and member list",
-      "reason": "No requirement specified creating this new page in the BuildRequest",
-      "evidence": [
-        "frontend/src/pages/BuildingMembers.tsx"
-      ]
-    },
-    {
-      "description": "Enhanced Home page dashboard with real-time statistics from invite codes, stats cards showing active members and invite code usage, and quick actions section",
-      "reason": "No requirement specified these dashboard improvements in the BuildRequest",
-      "evidence": [
-        "frontend/src/pages/Home.tsx"
-      ]
-    },
-    {
-      "description": "URL parameter utility functions for onboarding flow management (storeOnboardingFlow, getOnboardingFlow, clearOnboardingFlow)",
-      "reason": "No requirement specified adding these utility functions in the BuildRequest",
-      "evidence": [
-        "frontend/src/utils/urlParams.ts"
+        "frontend/src/components/DaireGorunumu.tsx"
       ]
     }
   ],
-  "confidence": 0.95,
+  "confidence": 0.92,
   "changed_files": [
-    "backend/main.mo",
     "frontend-file-summaries.txt",
-    "frontend/src/components/InviteCodePanel.tsx",
-    "frontend/src/pages/BuildingMembers.tsx",
-    "frontend/src/pages/Home.tsx",
+    "frontend/src/components/DaireGorunumu.tsx",
+    "frontend/src/pages/OwnerDashboard.tsx",
     "frontend/src/utils/urlParams.ts",
     "project_state.json"
   ]

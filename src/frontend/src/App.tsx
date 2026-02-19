@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { RouterProvider, createRouter, createRoute, createRootRoute, Outlet, Navigate } from '@tanstack/react-router';
+import { RouterProvider, createRouter, createRoute, createRootRoute, Outlet, Navigate, useNavigate } from '@tanstack/react-router';
 import { InternetIdentityProvider, useInternetIdentity } from './hooks/useInternetIdentity';
 import { Toaster } from '@/components/ui/sonner';
 import { ThemeProvider } from 'next-themes';
@@ -11,9 +11,13 @@ import Profile from './pages/Profile';
 import Users from './pages/Users';
 import BuildingMembers from './pages/BuildingMembers';
 import Announcements from './pages/Announcements';
+import OwnerDashboard from './pages/OwnerDashboard';
+import ManagerDashboard from './pages/ManagerDashboard';
+import ResidentDashboard from './pages/ResidentDashboard';
 import { useGetCallerUserProfile } from './hooks/useQueries';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useEffect, useState } from 'react';
+import { Role } from './backend';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -28,6 +32,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { identity, isInitializing } = useInternetIdentity();
   const { data: userProfile, isLoading: profileLoading, isFetched } = useGetCallerUserProfile();
   const [showProfileSetup, setShowProfileSetup] = useState(false);
+  const navigate = useNavigate();
 
   const isAuthenticated = !!identity;
 
@@ -36,6 +41,40 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
       setShowProfileSetup(userProfile === null);
     }
   }, [isAuthenticated, profileLoading, isFetched, userProfile]);
+
+  // Role-based routing after authentication
+  useEffect(() => {
+    if (isAuthenticated && !profileLoading && isFetched && userProfile) {
+      const hasBuildingId = userProfile.binaId !== null && userProfile.binaId !== undefined;
+      
+      // If user has a building assignment, route based on role
+      if (hasBuildingId) {
+        const currentPath = window.location.pathname;
+        
+        // Don't redirect if already on a valid page
+        if (currentPath === '/profile' || currentPath === '/announcements') {
+          return;
+        }
+
+        // Route based on role
+        let targetRoute = '/';
+        
+        if (userProfile.role === Role.binaSahibi) {
+          targetRoute = '/owner-dashboard';
+        } else if (userProfile.role === Role.yetkili) {
+          targetRoute = '/manager-dashboard';
+        } else if (userProfile.role === Role.sakin) {
+          targetRoute = '/resident-dashboard';
+        }
+
+        // Only navigate if not already on the target route or a role-specific dashboard
+        const isDashboardRoute = currentPath.includes('dashboard');
+        if (!isDashboardRoute || currentPath !== targetRoute) {
+          navigate({ to: targetRoute });
+        }
+      }
+    }
+  }, [isAuthenticated, profileLoading, isFetched, userProfile, navigate]);
 
   if (isInitializing || (isAuthenticated && profileLoading)) {
     return (
@@ -145,6 +184,36 @@ const announcementsRoute = createRoute({
   ),
 });
 
+const ownerDashboardRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/owner-dashboard',
+  component: () => (
+    <ProtectedRoute>
+      <OwnerDashboard />
+    </ProtectedRoute>
+  ),
+});
+
+const managerDashboardRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/manager-dashboard',
+  component: () => (
+    <ProtectedRoute>
+      <ManagerDashboard />
+    </ProtectedRoute>
+  ),
+});
+
+const residentDashboardRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/resident-dashboard',
+  component: () => (
+    <ProtectedRoute>
+      <ResidentDashboard />
+    </ProtectedRoute>
+  ),
+});
+
 const routeTree = rootRoute.addChildren([
   loginRoute,
   dashboardRoute,
@@ -153,6 +222,9 @@ const routeTree = rootRoute.addChildren([
   usersRoute,
   buildingMembersRoute,
   announcementsRoute,
+  ownerDashboardRoute,
+  managerDashboardRoute,
+  residentDashboardRoute,
 ]);
 
 const router = createRouter({ routeTree });

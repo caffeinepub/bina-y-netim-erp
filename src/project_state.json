@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 21,
+  "projectStateVersion": 31,
   "summary": "Bina Yönetim ERP Uygulaması - Multi-tenant, rol bazlı bina yönetim sistemi. Internet Identity tek kimlik doğrulama yöntemi. Davet kodu giriş yöntemi değil, rol ve bina eşleştirme aracıdır. Kullanıcılar Internet Identity ile giriş yapar, binaya bağlı değilse davet kodu girer veya bina oluşturur. Onboarding akışı: Bina Sahibi (bina oluşturma), Yetkili (davet kodu), Sakin/Personel (davet kodu). Login ekranında 3 farklı onboarding akışı seçeneği aynı anda gösterilecek.",
   "architectural_notes": [
     "Internet Identity tek kimlik doğrulama yöntemi",
@@ -232,6 +232,246 @@
         "REQ-44"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-update-the-post-authentication-routing-logic-in-frontend-src-app-tsx-to-correctly-handle-the-three-onboarding-flows-stored-in-session-storage-1-building-owner-flow-should-redirect-to-home-page-with-building-creation-form-2-authority-flow-should-redirect-to-home-page-with-invite-code-entry-section-3-resident-flow-should-redirect-to-home-page-with-invite-code-entry-section-instead-of-all-flows-redirecting-to-the-building-management-page",
+      "title": "Update the post-authentication routing logic in frontend/src/App.tsx to correctly handle the three onboarding flows stored in session storage: (1) 'building-owner' flow should redirect to Home page with building creation form, (2) 'authority' flow should redirect to Home page with invite code entry section, (3) 'resident' flow should redirect to Home page with invite code entry section, instead of all flows redirecting to the building management page",
+      "reqIds": [
+        "REQ-45"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-verify-and-fix-the-session-storage-persistence-mechanism-in-frontend-src-utils-urlparams-ts-to-ensure-the-onboarding-flow-type-building-owner-authority-or-resident-selected-on-the-login-page-is-correctly-stored-and-retrieved-after-internet-identity-authentication-completes",
+      "title": "Verify and fix the session storage persistence mechanism in frontend/src/utils/urlParams.ts to ensure the onboarding flow type ('building-owner', 'authority', or 'resident') selected on the Login page is correctly stored and retrieved after Internet Identity authentication completes",
+      "reqIds": [
+        "REQ-46"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-home-page-frontend-src-pages-home-tsx-conditional-rendering-logic-to-properly-display-the-onboarding-section-with-appropriate-controls-based-on-the-user-s-selected-onboarding-flow-show-building-creation-button-for-building-owner-flow-show-invite-code-entry-for-authority-and-resident-flows",
+      "title": "Update the Home page (frontend/src/pages/Home.tsx) conditional rendering logic to properly display the onboarding section with appropriate controls based on the user's selected onboarding flow: show building creation button for 'building-owner' flow, show invite code entry for 'authority' and 'resident' flows",
+      "reqIds": [
+        "REQ-47"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-debugging-logging-or-console-output-in-the-authentication-flow-to-track-the-onboarding-flow-selection-session-storage-state-and-routing-decisions-to-identify-where-the-incorrect-redirection-to-building-management-page-is-occurring",
+      "title": "Add debugging logging or console output in the authentication flow to track the onboarding flow selection, session storage state, and routing decisions to identify where the incorrect redirection to building management page is occurring",
+      "reqIds": [
+        "REQ-48"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-three-separate-dashboard-page-components-in-the-frontend-ownerdashboard-tsx-for-bina-sahibi-users-managerdashboard-tsx-for-yetkili-users-and-residentdashboard-tsx-for-sakin-users-each-containing-role-appropriate-content-placeholders",
+      "title": "Create three separate dashboard page components in the frontend: OwnerDashboard.tsx for BINA_SAHIBI users, ManagerDashboard.tsx for YETKILI users, and ResidentDashboard.tsx for SAKIN users, each containing role-appropriate content placeholders",
+      "reqIds": [
+        "REQ-49"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-ownerdashboard-component-to-display-full-management-features-including-invite-code-creation-panel-for-both-yetkili-and-sakin-roles-user-list-access-and-management-module-placeholders-with-turkish-labels",
+      "title": "Implement OwnerDashboard component to display full management features including invite code creation panel for both YETKILI and SAKIN roles, user list access, and management module placeholders with Turkish labels",
+      "reqIds": [
+        "REQ-50"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-managerdashboard-component-to-display-limited-management-features-including-invite-code-creation-panel-for-sakin-role-only-issue-task-management-placeholders-with-explicit-restrictions-preventing-yetkili-invite-creation-and-building-settings-access",
+      "title": "Implement ManagerDashboard component to display limited management features including invite code creation panel for SAKIN role only, issue/task management placeholders, with explicit restrictions preventing YETKILI invite creation and building settings access",
+      "reqIds": [
+        "REQ-51"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-residentdashboard-component-to-display-basic-resident-features-including-announcements-display-and-issue-reporting-placeholders-with-no-access-to-any-management-or-invite-code-features",
+      "title": "Implement ResidentDashboard component to display basic resident features including announcements display and issue reporting placeholders, with no access to any management or invite code features",
+      "reqIds": [
+        "REQ-52"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-post-authentication-routing-logic-in-frontend-src-app-tsx-to-fetch-the-authenticated-user-s-role-from-their-profile-and-redirect-to-the-appropriate-role-specific-dashboard-bina-sahibi-users-to-owner-dashboard-yetkili-users-to-manager-dashboard-and-sakin-users-to-resident-dashboard",
+      "title": "Update the post-authentication routing logic in frontend/src/App.tsx to fetch the authenticated user's role from their profile and redirect to the appropriate role-specific dashboard: BINA_SAHIBI users to /owner-dashboard, YETKILI users to /manager-dashboard, and SAKIN users to /resident-dashboard",
+      "reqIds": [
+        "REQ-53"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-remove-or-deprecate-the-existing-building-management-page-route-building-management-that-currently-receives-all-authenticated-users-ensuring-it-is-no-longer-used-as-a-default-landing-page-after-login",
+      "title": "Remove or deprecate the existing building management page route (/building-management) that currently receives all authenticated users, ensuring it is no longer used as a default landing page after login",
+      "reqIds": [
+        "REQ-54"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-route-definitions-in-the-frontend-router-for-the-three-new-dashboard-pages-owner-dashboard-manager-dashboard-and-resident-dashboard-ensuring-each-route-is-protected-and-requires-authentication",
+      "title": "Add route definitions in the frontend router for the three new dashboard pages: /owner-dashboard, /manager-dashboard, and /resident-dashboard, ensuring each route is protected and requires authentication",
+      "reqIds": [
+        "REQ-55"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-navigation-component-to-display-role-appropriate-menu-items-show-full-navigation-options-for-bina-sahibi-limited-options-for-yetkili-excluding-building-settings-and-minimal-options-for-sakin-excluding-all-management-features",
+      "title": "Update the Navigation component to display role-appropriate menu items: show full navigation options for BINA_SAHIBI, limited options for YETKILI (excluding building settings), and minimal options for SAKIN (excluding all management features)",
+      "reqIds": [
+        "REQ-56"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-a-user-list-component-in-the-owner-dashboard-ownerdashboard-tsx-that-displays-all-users-in-the-building-with-columns-for-principal-id-role-displayed-in-turkish-using-roletranslations-utility-and-apartment-assignment-daire-field-that-initially-shows-empty-null-values",
+      "title": "Create a user list component in the Owner Dashboard (OwnerDashboard.tsx) that displays all users in the building with columns for Principal ID, role (displayed in Turkish using roleTranslations utility), and apartment assignment (daire) field that initially shows empty/null values",
+      "reqIds": [
+        "REQ-57"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-react-query-hook-uselistbuildingusers-in-frontend-src-hooks-usequeries-ts-that-fetches-the-building-user-list-using-the-kullanicilarilistele-backend-function",
+      "title": "Create React Query hook useListBuildingUsers in frontend/src/hooks/useQueries.ts that fetches the building user list using the kullanicilariListele backend function",
+      "reqIds": [
+        "REQ-59"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-integrate-the-invitecodepanel-component-into-the-owner-dashboard-to-display-the-existing-invite-code-management-interface-with-both-yetkili-and-sakin-role-creation-options",
+      "title": "Integrate the InviteCodePanel component into the Owner Dashboard to display the existing invite code management interface with both YETKILI and SAKIN role creation options",
+      "reqIds": [
+        "REQ-60"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-apartment-creation-form-component-in-the-owner-dashboard-that-accepts-a-daireadi-input-field-validates-it-calls-the-daireolustur-backend-function-and-displays-success-error-feedback-in-turkish",
+      "title": "Create apartment creation form component in the Owner Dashboard that accepts a daireAdi input field, validates it, calls the daireOlustur backend function, and displays success/error feedback in Turkish",
+      "reqIds": [
+        "REQ-65"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-apartment-list-component-in-the-owner-dashboard-that-displays-all-apartments-in-a-table-format-showing-daireadi-and-creation-date",
+      "title": "Create apartment list component in the Owner Dashboard that displays all apartments in a table format showing daireAdi and creation date",
+      "reqIds": [
+        "REQ-66"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-react-query-hooks-in-frontend-src-hooks-usequeries-ts-for-apartment-operations-usecreateapartment-mutation-for-creating-apartments-and-uselistapartments-query-for-fetching-apartments-with-automatic-cache-invalidation-on-successful-creation",
+      "title": "Create React Query hooks in frontend/src/hooks/useQueries.ts for apartment operations: useCreateApartment mutation for creating apartments and useListApartments query for fetching apartments, with automatic cache invalidation on successful creation",
+      "reqIds": [
+        "REQ-67"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-announcement-creation-form-component-in-the-owner-dashboard-with-input-fields-for-baslik-title-and-aciklama-description-validation-backend-integration-calling-duyuruolustur-and-turkish-success-error-feedback",
+      "title": "Create announcement creation form component in the Owner Dashboard with input fields for baslik (title) and aciklama (description), validation, backend integration calling duyuruOlustur, and Turkish success/error feedback",
+      "reqIds": [
+        "REQ-71"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-announcement-list-component-in-the-owner-dashboard-that-displays-all-announcements-in-card-format-showing-baslik-aciklama-creation-date-and-creator-information",
+      "title": "Create announcement list component in the Owner Dashboard that displays all announcements in card format showing baslik, aciklama, creation date, and creator information",
+      "reqIds": [
+        "REQ-72"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-react-query-hooks-in-frontend-src-hooks-usequeries-ts-for-announcement-operations-usecreateannouncement-mutation-for-creating-announcements-and-uselistannouncements-query-for-fetching-announcements-with-automatic-cache-invalidation-on-successful-creation",
+      "title": "Create React Query hooks in frontend/src/hooks/useQueries.ts for announcement operations: useCreateAnnouncement mutation for creating announcements and useListAnnouncements query for fetching announcements, with automatic cache invalidation on successful creation",
+      "reqIds": [
+        "REQ-73"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-ownerdashboard-tsx-layout-to-organize-the-four-feature-sections-user-list-invite-code-management-apartment-management-announcement-management-in-a-clear-scannable-layout-with-section-headers-in-turkish-and-consistent-spacing",
+      "title": "Update the OwnerDashboard.tsx layout to organize the four feature sections (user list, invite code management, apartment management, announcement management) in a clear, scannable layout with section headers in Turkish and consistent spacing",
+      "reqIds": [
+        "REQ-74"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-managerdashboard-component-frontend-src-pages-managerdashboard-tsx-to-display-the-invitecodepanel-component-with-restricted-options-that-only-allow-yetkili-users-to-create-invite-codes-for-sakin-role-ensuring-the-panel-validates-permissions-properly",
+      "title": "Update the ManagerDashboard component (frontend/src/pages/ManagerDashboard.tsx) to display the InviteCodePanel component with restricted options that only allow YETKILI users to create invite codes for SAKIN role, ensuring the panel validates permissions properly",
+      "reqIds": [
+        "REQ-75"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-an-issue-fault-list-component-in-the-managerdashboard-that-displays-open-issues-ar-zalar-in-a-table-format-with-columns-for-apartment-daire-reporting-user-bildiren-status-durum-and-creation-date",
+      "title": "Create an issue/fault list component in the ManagerDashboard that displays open issues (arızalar) in a table format with columns for apartment (daire), reporting user (bildiren), status (durum), and creation date",
+      "reqIds": [
+        "REQ-76"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-react-query-hook-uselistissues-in-frontend-src-hooks-usequeries-ts-that-fetches-issues-for-the-authenticated-user-s-building-using-the-arizalarilistele-backend-function-with-proper-loading-and-error-state-management",
+      "title": "Create React Query hook useListIssues in frontend/src/hooks/useQueries.ts that fetches issues for the authenticated user's building using the arizalariListele backend function, with proper loading and error state management",
+      "reqIds": [
+        "REQ-77"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-managerdashboard-layout-to-organize-the-two-feature-sections-resident-invite-code-management-and-issue-tracking-in-a-clear-scannable-layout-with-turkish-section-headers-sakin-davet-y-netimi-a-k-ar-zalar-and-consistent-spacing-matching-ownerdashboard-patterns",
+      "title": "Update the ManagerDashboard layout to organize the two feature sections (resident invite code management and issue tracking) in a clear, scannable layout with Turkish section headers ('Sakin Davet Yönetimi', 'Açık Arızalar') and consistent spacing matching OwnerDashboard patterns",
+      "reqIds": [
+        "REQ-78"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-a-visual-apartment-layout-grid-component-dairegorunumu-tsx-in-the-frontend-that-displays-all-apartments-in-an-interactive-grid-card-layout-showing-apartment-name-number-daireadi-on-each-card",
+      "title": "Create a visual apartment layout grid component (DaireGorunumu.tsx) in the frontend that displays all apartments in an interactive grid/card layout, showing apartment name/number (daireAdi) on each card",
+      "reqIds": [
+        "REQ-79"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-integrate-the-dairegorunumu-component-into-the-ownerdashboard-page-frontend-src-pages-ownerdashboard-tsx-as-a-new-section-titled-daire-g-r-n-m-positioned-after-the-existing-apartment-management-section",
+      "title": "Integrate the DaireGorunumu component into the OwnerDashboard page (frontend/src/pages/OwnerDashboard.tsx) as a new section titled 'Daire Görünümü' positioned after the existing apartment management section",
+      "reqIds": [
+        "REQ-80"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-visual-indicators-to-apartment-cards-showing-occupancy-status-display-a-subtle-badge-or-icon-indicating-whether-the-apartment-is-assigned-to-a-user-based-on-checking-if-any-user-s-daireid-matches-the-apartment-s-daireid",
+      "title": "Add visual indicators to apartment cards showing occupancy status: display a subtle badge or icon indicating whether the apartment is assigned to a user (based on checking if any user's daireId matches the apartment's daireId)",
+      "reqIds": [
+        "REQ-81"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-hover-interactions-on-apartment-cards-that-display-additional-information-in-a-tooltip-or-popover-including-creation-date-olusturmatarihi-formatted-in-turkish-locale",
+      "title": "Implement hover interactions on apartment cards that display additional information in a tooltip or popover, including creation date (olusturmaTarihi) formatted in Turkish locale",
+      "reqIds": [
+        "REQ-82"
+      ],
+      "version": 1
     }
   ],
   "new_feature_requests": [
@@ -429,6 +669,190 @@
       "reqIds": [
         "REQ-42"
       ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-52",
+      "summary": "Create role-based dashboard routing: BINA_SAHIBI → OwnerDashboard (with invite management, user list, management modules), YETKILI → ManagerDashboard (with resident invite only, no authority invite, limited access), SAKIN → ResidentDashboard (announcements, issue reporting only)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-53",
+      "summary": "Implement post-login routing logic that fetches user role and redirects to role-specific dashboard instead of defaulting all users to building management page",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-54",
+      "summary": "Create OwnerDashboard component with full management features: invite code creation for YETKILI and SAKIN, user list, building settings",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-55",
+      "summary": "Create ManagerDashboard component with limited features: invite code creation for SAKIN only, issue/task management, no access to building settings or authority invite",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-56",
+      "summary": "Create ResidentDashboard component with basic features: announcements, issue reporting, no management access",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-57",
+      "summary": "Create a user list view in the Owner Dashboard that displays all users in the building with their Principal ID, role, and apartment assignment (initially empty)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-58",
+      "summary": "Implement invite code management panel in Owner Dashboard that allows BINA_SAHIBI to create invite codes for both YETKILI and SAKIN roles and displays a list of all created codes with their details",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-59",
+      "summary": "Create apartment (daire) data model in backend with basic fields: daireId, daireAdi (apartment identifier like 1, 2, A1, B2), binaId",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-60",
+      "summary": "Implement apartment creation functionality in Owner Dashboard that allows BINA_SAHIBI to add new apartments with simple identifiers (numbers or codes)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-61",
+      "summary": "Create apartment list view in Owner Dashboard that displays all apartments in the building",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-62",
+      "summary": "Create announcement (duyuru) data model in backend with fields: duyuruId, baslik (title), aciklama (description), olusturanPrincipal, olusturmaTarihi, binaId",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-63",
+      "summary": "Implement announcement creation form in Owner Dashboard that allows BINA_SAHIBI to create announcements with title and description fields",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-64",
+      "summary": "Add backend function duyuruOlustur(baslik: Text, aciklama: Text) that creates a new announcement for the authenticated user's building",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-65",
+      "summary": "Add backend function duyurulariListele() that returns all announcements for the authenticated user's building",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-67",
+      "summary": "Add backend function kullanicilariListele() that returns an array of all users associated with the authenticated user's building, including their Principal ID, role, and daireId (apartment assignment)",
+      "reqIds": [
+        "REQ-58"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-70",
+      "summary": "Add daireId (Text, optional) field to the User/Profile data model in the backend to store apartment assignment for each user",
+      "reqIds": [
+        "REQ-61"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-71",
+      "summary": "Create Daire (apartment) data model in the backend with fields: daireId (unique identifier), daireAdi (apartment name/number like '1', '2', 'A1', 'B2'), binaId (building identifier), and olusturmaTarihi (creation timestamp)",
+      "reqIds": [
+        "REQ-62"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-72",
+      "summary": "Implement backend function daireOlustur(daireAdi: Text) that creates a new apartment in the authenticated user's building, generates a unique daireId, and stores it in stable storage",
+      "reqIds": [
+        "REQ-63"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-73",
+      "summary": "Implement backend function daireleriListele() that returns an array of all apartments in the authenticated user's building, including daireId, daireAdi, and olusturmaTarihi",
+      "reqIds": [
+        "REQ-64"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-77",
+      "summary": "Create Duyuru (announcement) data model in the backend with fields: duyuruId (unique identifier), baslik (title), aciklama (description), olusturanPrincipal (creator's Principal ID), olusturmaTarihi (creation timestamp), and binaId (building identifier)",
+      "reqIds": [
+        "REQ-68"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-78",
+      "summary": "Implement backend function duyuruOlustur(baslik: Text, aciklama: Text) that creates a new announcement in the authenticated user's building, generates a unique duyuruId, stores it in stable storage, and returns the created announcement",
+      "reqIds": [
+        "REQ-69"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-79",
+      "summary": "Implement backend function duyurulariListele() that returns an array of all announcements for the authenticated user's building, ordered by creation date descending",
+      "reqIds": [
+        "REQ-70"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-80",
+      "summary": "Implement resident invite code creation in Manager Dashboard (ManagerDashboard.tsx) that allows YETKILI users to create invite codes for SAKIN role only, with proper role validation",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-81",
+      "summary": "Create issue/fault tracking list view in Manager Dashboard that displays open issues/faults with apartment, user, and status information",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-82",
+      "summary": "Add backend data model for Ariza (issue/fault) with fields: arizaId, baslik, aciklama, daireId, bildirenPrincipal, durum (open/closed), olusturmaTarihi, binaId",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-83",
+      "summary": "Implement backend function arizalariListele() that returns all issues for the authenticated user's building, ordered by creation date",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-84",
+      "summary": "Create React Query hook useListIssues in frontend/src/hooks/useQueries.ts that fetches issues for the building using arizalariListele backend function",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-85",
+      "summary": "Create visual apartment view/layout component in Owner Dashboard that displays all apartments in a grid or floor plan view",
+      "reqIds": [],
       "status": "pending"
     }
   ],

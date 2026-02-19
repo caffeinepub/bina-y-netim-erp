@@ -208,35 +208,39 @@ export function getSecretParameter(paramName: string): string | null {
 }
 
 /**
- * Onboarding flow helpers
- * Used to persist the user's selected onboarding path across login
+ * Onboarding flow management
+ * Used to persist user's selected registration path through Internet Identity authentication
  */
 
 const ONBOARDING_FLOW_KEY = 'onboardingFlow';
 
 /**
- * Stores the onboarding flow type in sessionStorage
- * @param flow - The onboarding flow type ('building-owner', 'authority', or 'resident')
+ * Stores the selected onboarding flow type in session storage
+ * This persists the user's choice through the Internet Identity authentication flow
+ *
+ * @param flowType - The type of onboarding flow ('building-owner', 'authority', or 'resident')
  */
-export function storeOnboardingFlow(flow: 'building-owner' | 'authority' | 'resident'): void {
-    storeSessionParameter(ONBOARDING_FLOW_KEY, flow);
+export function storeOnboardingFlow(flowType: 'building-owner' | 'authority' | 'resident'): void {
+    console.log('urlParams: Storing onboarding flow:', flowType);
+    storeSessionParameter(ONBOARDING_FLOW_KEY, flowType);
 }
 
 /**
- * Retrieves the stored onboarding flow type
- * @returns The onboarding flow type if found, null otherwise
+ * Retrieves the stored onboarding flow type from session storage
+ *
+ * @returns The stored flow type if found, null otherwise
  */
 export function getOnboardingFlow(): 'building-owner' | 'authority' | 'resident' | null {
     const flow = getSessionParameter(ONBOARDING_FLOW_KEY);
-    if (flow === 'building-owner' || flow === 'authority' || flow === 'resident') {
-        return flow;
-    }
-    return null;
+    console.log('urlParams: Retrieved onboarding flow:', flow);
+    return flow as 'building-owner' | 'authority' | 'resident' | null;
 }
 
 /**
- * Clears the stored onboarding flow from sessionStorage
+ * Clears the stored onboarding flow from session storage
+ * Should be called after the onboarding flow has been completed
  */
 export function clearOnboardingFlow(): void {
+    console.log('urlParams: Clearing onboarding flow');
     clearSessionParameter(ONBOARDING_FLOW_KEY);
 }
