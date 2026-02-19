@@ -1,96 +1,116 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Add Resident Dashboard features: announcements display and issue reporting",
+  "title": "Fix blank screen after login - display role-specific dashboard content",
   "requirements": [
     {
-      "id": "REQ-83",
-      "summary": "Display comprehensive announcements list in ResidentDashboard with Turkish header 'Duyurular'",
+      "id": "REQ-92",
+      "summary": "Debug and fix post-authentication routing flow to ensure users are correctly redirected to role-specific dashboards after Internet Identity authentication",
       "acceptanceCriteria": [
-        "AnnouncementsList component is integrated into ResidentDashboard",
-        "Announcements are displayed in card format with all required fields",
-        "Section has clear Turkish header 'Duyurular'",
-        "Loading and error states are handled properly",
-        "Empty state message is shown when no announcements exist"
+        "After successful Internet Identity login, users with BINA_SAHIBI role are redirected to /owner-dashboard and see dashboard content",
+        "After successful Internet Identity login, users with YETKILI role are redirected to /manager-dashboard and see dashboard content",
+        "After successful Internet Identity login, users with SAKIN role are redirected to /resident-dashboard and see dashboard content",
+        "No blank screen appears after authentication completes",
+        "Console logs track the authentication state, user role fetching, and routing decisions for debugging"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/pages/ResidentDashboard.tsx",
+          "path": "frontend/src/App.tsx",
           "operation": "modify",
-          "description": "Import and integrate the existing AnnouncementsList component with a Turkish section header 'Duyurular'. Wrap the announcements section in a card container with proper spacing. Ensure the section displays title, description, creation date, and creator information for each announcement. The AnnouncementsList component already handles loading, error, and empty states."
+          "description": "Fix the role-based routing logic to properly wait for user profile data before making redirect decisions. Add defensive checks to ensure userProfile is loaded before attempting to access role property. Add console.log statements to track authentication state transitions, profile fetch status, and routing decisions. Ensure the ProtectedRoute wrapper properly handles loading states and waits for both authentication and profile data. Fix any race conditions where routing decisions are made before profile data is available."
         }
       ]
     },
     {
-      "id": "REQ-84",
-      "summary": "Create issue reporting form component for SAKIN users with Turkish labels and validation",
+      "id": "REQ-93",
+      "summary": "Verify user profile query properly fetches authenticated user's role and building association immediately after Internet Identity authentication with proper error handling",
       "acceptanceCriteria": [
-        "Form component accepts title, description, and apartment selection",
-        "Apartment dropdown is populated from useListApartments query",
-        "Form validation ensures all required fields are filled",
-        "Success toast shows 'Arıza başarıyla bildirildi' message",
-        "Error toast shows appropriate Turkish error messages",
-        "Form resets after successful submission"
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/components/IssueReportForm.tsx",
-          "operation": "create",
-          "description": "Create a form component that allows residents to report building issues. Include form fields for baslik (title - Input), aciklama (description - Textarea), and daireId (apartment selection - Select dropdown). Use the useListApartments hook to populate the apartment dropdown. Implement form validation to ensure all required fields are filled. On successful submission using the useReportIssue mutation hook, display a success toast with the message 'Arıza başarıyla bildirildi' and reset the form. On error, display a toast with the error message in Turkish. Use shadcn/ui components (Card, CardHeader, CardTitle, CardContent, Label, Input, Textarea, Select, Button) for consistent styling. Include loading state on the submit button while the mutation is pending."
-        }
-      ]
-    },
-    {
-      "id": "REQ-86",
-      "summary": "Create React Query mutation hook for reporting issues with cache invalidation",
-      "acceptanceCriteria": [
-        "Hook uses useMutation from React Query",
-        "Mutation calls backend arizaBildir function with provided parameters",
-        "On success, invalidates 'issues' query cache to refresh issue lists",
-        "Returns proper loading, error, and success states",
-        "Error messages are properly propagated for display"
+        "User profile data (including role and binaId) is fetched immediately after authentication",
+        "Profile fetch errors are logged and displayed to users in Turkish",
+        "Loading states are properly handled while profile data is being fetched",
+        "Role-based routing waits for profile data before making redirect decisions"
       ],
       "file_operations": [
         {
           "path": "frontend/src/hooks/useQueries.ts",
           "operation": "modify",
-          "description": "Add a new useReportIssue mutation hook that calls the backend arizaBildir function with parameters (baslik: string, aciklama: string, daireId: string). Use useMutation from @tanstack/react-query. On successful mutation, invalidate the 'issues' query key to refresh any issue lists displayed in the application. Return the mutation object with isLoading, isError, error, and mutate properties for use in the IssueReportForm component. Ensure error messages from the backend are properly propagated for display in the UI."
+          "description": "Review and enhance the useGetCallerUserProfile hook to ensure it properly waits for the actor to be available before fetching. Verify the enabled condition checks both actor availability and authentication state. Add error handling that logs failures and returns user-friendly Turkish error messages. Ensure the hook returns proper loading states that downstream components can rely on. Add retry logic for transient failures. Verify the queryKey is correctly configured to trigger refetches when authentication state changes."
+        },
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "modify",
+          "description": "Add error boundary or error handling logic in App.tsx to catch and display profile fetch errors in Turkish. Show loading spinners or skeleton states while user profile is being fetched after authentication. Add console.log statements to track profile fetch lifecycle (pending, success, error states). Ensure routing logic waits for both isLoading and isFetching states to complete before making redirect decisions."
         }
       ]
     },
     {
-      "id": "REQ-87",
-      "summary": "Integrate IssueReportForm into ResidentDashboard with Turkish header 'Arıza Bildir'",
+      "id": "REQ-94",
+      "summary": "Add defensive checks in role-specific dashboard components to handle cases where user profile data is missing or incomplete",
       "acceptanceCriteria": [
-        "IssueReportForm is displayed in ResidentDashboard",
-        "Section header 'Arıza Bildir' is clear and prominent",
-        "Form is positioned logically after announcements section",
-        "Spacing and layout are consistent with other dashboard pages",
-        "Form is responsive and works on mobile devices"
+        "Dashboard components display loading skeletons while profile data is being fetched",
+        "Dashboard components show Turkish error messages when profile data fails to load",
+        "Dashboard components gracefully handle null/undefined user data",
+        "Users see meaningful feedback instead of blank screens"
       ],
       "file_operations": [
         {
+          "path": "frontend/src/pages/OwnerDashboard.tsx",
+          "operation": "modify",
+          "description": "Add defensive checks at the component entry to verify userProfile exists and contains required fields (role, binaId). Display a loading skeleton using existing UI components while profile data is being fetched (check isLoading from useGetCallerUserProfile). Show a Turkish error message in a Card component if profile fetch fails or userProfile is null after loading completes. Add fallback rendering for when binaId is missing (e.g., 'Bina bilgisi yüklenemedi' message). Ensure all data dependencies (building, users, apartments) properly handle the case where parent profile data is unavailable."
+        },
+        {
+          "path": "frontend/src/pages/ManagerDashboard.tsx",
+          "operation": "modify",
+          "description": "Add defensive checks at the component entry to verify userProfile exists and contains required fields (role, binaId). Display a loading skeleton using Card components while profile data is being fetched. Show a Turkish error message if profile fetch fails or userProfile is null after loading completes (e.g., 'Kullanıcı profili yüklenemedi. Lütfen tekrar giriş yapın.'). Add fallback rendering for when binaId is missing. Ensure the issues list and invite code statistics properly handle missing profile data without crashing."
+        },
+        {
           "path": "frontend/src/pages/ResidentDashboard.tsx",
           "operation": "modify",
-          "description": "Import and integrate the IssueReportForm component into the ResidentDashboard page. Position the issue reporting section below the announcements section with a clear Turkish header 'Arıza Bildir'. Wrap the form in a card container matching the styling of the announcements section. Ensure consistent spacing between sections using Tailwind spacing utilities (e.g., space-y-6). The layout should be responsive and work well on mobile devices. Follow the same card-based pattern used in OwnerDashboard and ManagerDashboard for visual consistency."
+          "description": "Add defensive checks at the component entry to verify userProfile exists and contains required fields (role, daireId). Display a loading skeleton using Card components while profile data is being fetched. Show a Turkish error message if profile fetch fails or userProfile is null after loading completes (e.g., 'Profil bilgileri yüklenemedi'). Add fallback rendering for when daireId is missing (e.g., 'Daire ataması yapılmamış' message). Ensure announcements list and issue report form handle missing profile data gracefully."
         }
       ]
     },
     {
-      "id": "REQ-88",
-      "summary": "Update ResidentDashboard layout for clear organization of announcements and issue reporting sections",
+      "id": "REQ-95",
+      "summary": "Fix onboarding flow handling in Home.tsx to properly render onboarding UI for new users and role-based content for existing users",
       "acceptanceCriteria": [
-        "Layout uses consistent card/section containers",
-        "Sections are clearly separated with appropriate spacing",
-        "Design matches patterns from OwnerDashboard and ManagerDashboard",
-        "Layout is responsive and adapts to different screen sizes",
-        "All text labels are in Turkish"
+        "New users without building assignment see the onboarding section with 'Bina Oluştur' or 'Davet Kodu Gir' options",
+        "Users with building assignment and valid roles see appropriate role-based content",
+        "Home page does not render blank when user profile is loaded",
+        "Session storage onboarding flow values are properly retrieved and used"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/pages/ResidentDashboard.tsx",
+          "path": "frontend/src/pages/Home.tsx",
           "operation": "modify",
-          "description": "Refactor the ResidentDashboard layout to organize the two feature sections (announcements and issue reporting) in a clear, scannable layout. Use a single-column stacked layout with consistent card containers for each section. Apply proper spacing between sections using Tailwind utilities (e.g., space-y-6 or gap-6). Ensure the design matches the card-based patterns used in OwnerDashboard and ManagerDashboard components. Make the layout responsive using Tailwind responsive utilities so sections adapt appropriately on mobile and tablet devices. Verify all section headers and labels are in Turkish ('Duyurular' for announcements, 'Arıza Bildir' for issue reporting). Each section should be wrapped in a Card component with CardHeader (containing CardTitle) and CardContent for consistent styling."
+          "description": "Review and fix the conditional rendering logic that determines whether to show onboarding UI vs. role-based dashboard content. Verify that the check for userProfile.binaId properly distinguishes between new users (no building) and existing users (has building). Ensure sessionStorage.getItem('onboardingFlow') is correctly retrieved and used to render the appropriate onboarding section (binaSahibiFlow, yetkiliFlow, sakinFlow). Add defensive null checks for userProfile before accessing properties. Add loading states while profile is being fetched. Fix any logic that causes blank rendering when profile is available but conditions are not properly evaluated. Add console.log statements to debug which rendering path is taken."
+        }
+      ]
+    },
+    {
+      "id": "REQ-96",
+      "summary": "Verify React Query cache invalidation logic properly refreshes user profile data after building creation, invite code registration, and role assignment operations",
+      "acceptanceCriteria": [
+        "After building creation, user profile is re-fetched and UI updates to show role-based dashboard",
+        "After invite code registration, user profile is re-fetched and UI updates to show role-based dashboard",
+        "Cache invalidation occurs automatically after successful mutations",
+        "No manual page refresh is required to see updated user state"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/hooks/useQueries.ts",
+          "operation": "modify",
+          "description": "Review and verify that useCreateBuilding mutation includes queryClient.invalidateQueries(['currentUserProfile']) in its onSuccess callback to trigger profile refetch after building creation. Review and verify that the invite code registration mutation (if exists, or add it if missing) includes queryClient.invalidateQueries(['currentUserProfile']) in its onSuccess callback. Ensure all mutations that affect user state (building creation, role assignment, invite code usage) properly invalidate the currentUserProfile query key. Add console.log statements in onSuccess callbacks to confirm invalidation is triggered. Verify queryClient is properly imported and used in all relevant mutation hooks."
+        },
+        {
+          "path": "frontend/src/components/BuildingCreateForm.tsx",
+          "operation": "modify",
+          "description": "Verify that after successful building creation, the component either triggers a profile refetch or relies on the mutation's cache invalidation. Add a callback or navigation logic that waits for profile refetch to complete before redirecting or updating UI. Ensure success toast appears and user sees updated state without manual refresh. Add console.log to track post-creation flow."
+        },
+        {
+          "path": "frontend/src/components/InviteCodeRegistration.tsx",
+          "operation": "modify",
+          "description": "Verify that after successful invite code registration, the component triggers cache invalidation for currentUserProfile. Add logic to wait for profile refetch to complete before showing success message or redirecting. Ensure the UI updates to reflect the new role and building assignment without requiring manual page refresh. Add console.log statements to track registration and profile update flow."
         }
       ]
     }

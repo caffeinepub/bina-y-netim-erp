@@ -30,14 +30,26 @@ const queryClient = new QueryClient({
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { identity, isInitializing } = useInternetIdentity();
-  const { data: userProfile, isLoading: profileLoading, isFetched } = useGetCallerUserProfile();
+  const { data: userProfile, isLoading: profileLoading, isFetched, error: profileError } = useGetCallerUserProfile();
   const [showProfileSetup, setShowProfileSetup] = useState(false);
   const navigate = useNavigate();
 
   const isAuthenticated = !!identity;
 
+  console.log('ProtectedRoute: Auth state:', {
+    isAuthenticated,
+    isInitializing,
+    profileLoading,
+    isFetched,
+    hasProfile: !!userProfile,
+    profileError: profileError?.message,
+    userRole: userProfile?.role,
+    hasBuildingId: userProfile?.binaId !== null && userProfile?.binaId !== undefined,
+  });
+
   useEffect(() => {
     if (isAuthenticated && !profileLoading && isFetched) {
+      console.log('ProtectedRoute: Profile fetch complete, userProfile:', userProfile);
       setShowProfileSetup(userProfile === null);
     }
   }, [isAuthenticated, profileLoading, isFetched, userProfile]);
@@ -47,12 +59,19 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
     if (isAuthenticated && !profileLoading && isFetched && userProfile) {
       const hasBuildingId = userProfile.binaId !== null && userProfile.binaId !== undefined;
       
+      console.log('ProtectedRoute: Checking routing logic', {
+        hasBuildingId,
+        role: userProfile.role,
+        currentPath: window.location.pathname,
+      });
+
       // If user has a building assignment, route based on role
       if (hasBuildingId) {
         const currentPath = window.location.pathname;
         
         // Don't redirect if already on a valid page
         if (currentPath === '/profile' || currentPath === '/announcements') {
+          console.log('ProtectedRoute: User on valid page, not redirecting');
           return;
         }
 
@@ -67,16 +86,24 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
           targetRoute = '/resident-dashboard';
         }
 
+        console.log('ProtectedRoute: Target route:', targetRoute);
+
         // Only navigate if not already on the target route or a role-specific dashboard
         const isDashboardRoute = currentPath.includes('dashboard');
         if (!isDashboardRoute || currentPath !== targetRoute) {
+          console.log('ProtectedRoute: Navigating to', targetRoute);
           navigate({ to: targetRoute });
+        } else {
+          console.log('ProtectedRoute: Already on correct dashboard');
         }
+      } else {
+        console.log('ProtectedRoute: No building ID, staying on home for onboarding');
       }
     }
   }, [isAuthenticated, profileLoading, isFetched, userProfile, navigate]);
 
   if (isInitializing || (isAuthenticated && profileLoading)) {
+    console.log('ProtectedRoute: Showing loading skeleton');
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="space-y-4 w-full max-w-md px-4">
@@ -89,13 +116,20 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   }
 
   if (!isAuthenticated) {
+    console.log('ProtectedRoute: Not authenticated, redirecting to login');
     return <Navigate to="/login" />;
   }
 
+  if (profileError) {
+    console.error('ProtectedRoute: Profile fetch error:', profileError);
+  }
+
   if (showProfileSetup) {
+    console.log('ProtectedRoute: Showing profile setup');
     return <Navigate to="/profile" />;
   }
 
+  console.log('ProtectedRoute: Rendering children');
   return <>{children}</>;
 }
 

@@ -1,16 +1,27 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Building2, Bell, Shield } from 'lucide-react';
+import { Building2, Bell, Shield, AlertCircle } from 'lucide-react';
 import { useGetUserBuilding, useGetCallerUserProfile } from '@/hooks/useQueries';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { getRoleDisplayName, getRoleVariant } from '@/utils/roleTranslations';
 import AnnouncementsList from '@/components/AnnouncementsList';
 import IssueReportForm from '@/components/IssueReportForm';
 
 export default function ResidentDashboard() {
-  const { data: building, isLoading: buildingLoading } = useGetUserBuilding();
-  const { data: userProfile, isLoading: profileLoading } = useGetCallerUserProfile();
+  const { data: building, isLoading: buildingLoading, error: buildingError } = useGetUserBuilding();
+  const { data: userProfile, isLoading: profileLoading, isFetched: profileFetched, error: profileError } = useGetCallerUserProfile();
 
+  console.log('ResidentDashboard: Render state', {
+    profileLoading,
+    profileFetched,
+    hasProfile: !!userProfile,
+    buildingLoading,
+    hasBuilding: !!building,
+    daireId: userProfile?.daireId,
+  });
+
+  // Show loading skeleton while data is being fetched
   if (buildingLoading || profileLoading) {
     return (
       <div className="container mx-auto px-4 py-8 space-y-6">
@@ -23,6 +34,24 @@ export default function ResidentDashboard() {
       </div>
     );
   }
+
+  // Show error if profile fetch failed
+  if (profileError || !userProfile) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Profil Yüklenemedi</AlertTitle>
+          <AlertDescription>
+            Kullanıcı profili yüklenirken bir hata oluştu. Lütfen tekrar giriş yapın.
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
+  }
+
+  // Show warning if apartment assignment is missing
+  const hasDaireId = userProfile.daireId !== null && userProfile.daireId !== undefined;
 
   return (
     <div className="container mx-auto px-4 py-8 space-y-6">
@@ -49,7 +78,7 @@ export default function ResidentDashboard() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Building2 className="h-5 w-5 text-green-600" />
-            {building?.binaAdi}
+            {building?.binaAdi || 'Bina Adı Yükleniyor...'}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -68,6 +97,17 @@ export default function ResidentDashboard() {
         </CardContent>
       </Card>
 
+      {/* Apartment Assignment Warning */}
+      {!hasDaireId && (
+        <Alert>
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Daire Ataması Yapılmamış</AlertTitle>
+          <AlertDescription>
+            Henüz bir daireye atanmadınız. Arıza bildirimi yapabilmek için bina yöneticinizle iletişime geçin.
+          </AlertDescription>
+        </Alert>
+      )}
+
       {/* Announcements Section */}
       <Card>
         <CardHeader>
@@ -82,7 +122,23 @@ export default function ResidentDashboard() {
       </Card>
 
       {/* Issue Reporting Section */}
-      <IssueReportForm />
+      {hasDaireId ? (
+        <IssueReportForm />
+      ) : (
+        <Card>
+          <CardHeader>
+            <CardTitle>Arıza Bildirimi</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Alert>
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>
+                Arıza bildirimi yapabilmek için önce bir daireye atanmanız gerekmektedir.
+              </AlertDescription>
+            </Alert>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }

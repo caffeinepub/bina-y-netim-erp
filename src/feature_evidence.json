@@ -2,9 +2,52 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-update-the-residentdashboard-component-frontend-src-pages-residentdashboard-tsx-to-display-a-comprehensive-announcements-list-section-showing-all-building-announcements-with-title-baslik-description-aciklama-creation-date-and-creator-information-in-a-card-based-layout-with-proper-spacing-and-turkish-section-header-duyurular",
-      "featureTitle": "Update the ResidentDashboard component (frontend/src/pages/ResidentDashboard.tsx) to display a comprehensive announcements list section showing all building announcements with title (baslik), description (aciklama), creation date, and creator information in a card-based layout with proper spacing and Turkish section header 'Duyurular'",
+      "featureId": "feature-debug-and-fix-the-post-authentication-routing-flow-in-frontend-src-app-tsx-to-ensure-users-are-correctly-redirected-to-their-role-specific-dashboards-ownerdashboard-managerdashboard-or-residentdashboard-after-internet-identity-authentication-completes-preventing-the-blank-screen-issue",
+      "featureTitle": "Debug and fix the post-authentication routing flow in frontend/src/App.tsx to ensure users are correctly redirected to their role-specific dashboards (OwnerDashboard, ManagerDashboard, or ResidentDashboard) after Internet Identity authentication completes, preventing the blank screen issue",
       "files": [
+        "frontend/src/App.tsx"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "authorization@4.0.0",
+        "invite-links@3.0.0"
+      ],
+      "testIds": [
+        "REQ-92"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-verify-that-the-user-profile-query-in-frontend-src-app-tsx-properly-fetches-the-authenticated-user-s-role-and-building-association-immediately-after-internet-identity-authentication-with-proper-error-handling-for-failed-profile-fetches",
+      "featureTitle": "Verify that the user profile query in frontend/src/App.tsx properly fetches the authenticated user's role and building association immediately after Internet Identity authentication, with proper error handling for failed profile fetches",
+      "files": [
+        "frontend/src/App.tsx",
+        "frontend/src/hooks/useQueries.ts"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "authorization@4.0.0",
+        "invite-links@3.0.0"
+      ],
+      "testIds": [
+        "REQ-93"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-add-defensive-checks-in-the-role-specific-dashboard-components-ownerdashboard-tsx-managerdashboard-tsx-residentdashboard-tsx-to-handle-cases-where-user-profile-data-is-missing-or-incomplete-displaying-appropriate-loading-states-or-error-messages-in-turkish",
+      "featureTitle": "Add defensive checks in the role-specific dashboard components (OwnerDashboard.tsx, ManagerDashboard.tsx, ResidentDashboard.tsx) to handle cases where user profile data is missing or incomplete, displaying appropriate loading states or error messages in Turkish",
+      "files": [
+        "frontend/src/pages/ManagerDashboard.tsx",
+        "frontend/src/pages/OwnerDashboard.tsx",
         "frontend/src/pages/ResidentDashboard.tsx"
       ],
       "components": [
@@ -17,15 +60,15 @@
         "invite-links@3.0.0"
       ],
       "testIds": [
-        "REQ-83"
+        "REQ-94"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-create-an-issue-reporting-form-component-issuereportform-tsx-in-the-frontend-that-allows-sakin-users-to-report-building-issues-faults-with-input-fields-for-baslik-title-aciklama-description-and-daireid-apartment-selection-via-dropdown-form-validation-and-success-error-feedback-in-turkish",
-      "featureTitle": "Create an issue reporting form component (IssueReportForm.tsx) in the frontend that allows SAKIN users to report building issues/faults with input fields for baslik (title), aciklama (description), and daireId (apartment selection via dropdown), form validation, and success/error feedback in Turkish",
+      "featureId": "feature-fix-the-onboarding-flow-handling-in-frontend-src-pages-home-tsx-to-ensure-the-component-properly-renders-onboarding-ui-for-new-users-without-buildings-and-role-based-dashboard-content-for-existing-users-with-building-assignments",
+      "featureTitle": "Fix the onboarding flow handling in frontend/src/pages/Home.tsx to ensure the component properly renders onboarding UI for new users without buildings, and role-based dashboard content for existing users with building assignments",
       "files": [
-        "frontend/src/components/IssueReportForm.tsx"
+        "frontend/src/pages/Home.tsx"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -37,13 +80,13 @@
         "invite-links@3.0.0"
       ],
       "testIds": [
-        "REQ-84"
+        "REQ-95"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-create-react-query-mutation-hook-usereportissue-in-frontend-src-hooks-usequeries-ts-that-calls-the-arizabildir-backend-function-handles-loading-states-and-invalidates-the-issues-query-cache-on-successful-issue-creation",
-      "featureTitle": "Create React Query mutation hook useReportIssue in frontend/src/hooks/useQueries.ts that calls the arizaBildir backend function, handles loading states, and invalidates the 'issues' query cache on successful issue creation",
+      "featureId": "feature-verify-that-the-react-query-cache-invalidation-logic-properly-refreshes-user-profile-data-after-building-creation-invite-code-registration-and-role-assignment-operations-to-ensure-ui-updates-reflect-the-latest-user-state",
+      "featureTitle": "Verify that the React Query cache invalidation logic properly refreshes user profile data after building creation, invite code registration, and role assignment operations to ensure UI updates reflect the latest user state",
       "files": [
         "frontend/src/hooks/useQueries.ts"
       ],
@@ -57,47 +100,7 @@
         "invite-links@3.0.0"
       ],
       "testIds": [
-        "REQ-86"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-integrate-the-issuereportform-component-into-the-residentdashboard-page-with-a-clear-turkish-section-header-ar-za-bildir-positioned-below-the-announcements-section-with-consistent-spacing-and-layout-matching-ownerdashboard-patterns",
-      "featureTitle": "Integrate the IssueReportForm component into the ResidentDashboard page with a clear Turkish section header 'Arıza Bildir', positioned below the announcements section with consistent spacing and layout matching OwnerDashboard patterns",
-      "files": [
-        "frontend/src/pages/ResidentDashboard.tsx"
-      ],
-      "components": [
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0",
-        "authorization@4.0.0",
-        "invite-links@3.0.0"
-      ],
-      "testIds": [
-        "REQ-87"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-update-the-residentdashboard-layout-to-organize-the-two-feature-sections-announcements-display-and-issue-reporting-in-a-clear-scannable-two-column-or-stacked-layout-with-proper-card-containers-consistent-with-ownerdashboard-and-managerdashboard-design-patterns",
-      "featureTitle": "Update the ResidentDashboard layout to organize the two feature sections (announcements display and issue reporting) in a clear, scannable two-column or stacked layout with proper card containers, consistent with OwnerDashboard and ManagerDashboard design patterns",
-      "files": [
-        "frontend/src/pages/ResidentDashboard.tsx"
-      ],
-      "components": [
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0",
-        "authorization@4.0.0",
-        "invite-links@3.0.0"
-      ],
-      "testIds": [
-        "REQ-88"
+        "REQ-96"
       ],
       "confidence": "high"
     }

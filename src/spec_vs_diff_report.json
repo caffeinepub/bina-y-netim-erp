@@ -1,34 +1,18 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-19T00:19:59.894Z",
-  "summary": "The diff implements most of the resident dashboard features for announcements display and issue reporting. Core backend functionality for arizaBildir is present, the IssueReportForm component is created with proper validation and Turkish labels, and the ResidentDashboard integrates both sections. However, the AnnouncementsList component implementation is not visible in the diff, creating uncertainty about whether REQ-83 is fully implemented.",
-  "missing_requirements": [
-    {
-      "id": "REQ-83",
-      "requirement": "Display comprehensive announcements list section showing all building announcements with title, description, creation date, and creator information in card-based layout",
-      "reason": "The AnnouncementsList component is imported and used in ResidentDashboard.tsx but the component file itself is not shown in the diff. Cannot verify if it displays all required fields (baslik, aciklama, creation date, creator), handles loading/error states, or shows empty state messages.",
-      "evidence": [
-        "frontend/src/pages/ResidentDashboard.tsx"
-      ]
-    }
-  ],
-  "hallucinated_features": [
-    {
-      "description": "Migration module (backend/migration.mo) with dummy actor structure",
-      "reason": "Not requested in BuildRequest. The file appears to be a placeholder/stub with no actual migration logic, which was not part of the requirements.",
-      "evidence": [
-        "backend/migration.mo"
-      ]
-    }
-  ],
-  "confidence": 0.75,
+  "generatedAt": "2026-02-19T01:50:37.741Z",
+  "summary": "The implementation addresses the core routing and profile fetching logic for role-based dashboards, with comprehensive console logging for debugging. All five requirements (REQ-92 through REQ-96) have evidence of implementation across the modified files, with proper Turkish error messages, loading states, and cache invalidation.",
+  "missing_requirements": [],
+  "hallucinated_features": [],
+  "confidence": 0.92,
   "changed_files": [
-    "backend/main.mo",
-    "backend/migration.mo",
     "frontend-file-summaries.txt",
-    "frontend/src/components/IssueReportForm.tsx",
+    "frontend/src/App.tsx",
     "frontend/src/hooks/useQueries.ts",
+    "frontend/src/pages/Home.tsx",
+    "frontend/src/pages/ManagerDashboard.tsx",
+    "frontend/src/pages/OwnerDashboard.tsx",
     "frontend/src/pages/ResidentDashboard.tsx",
     "frontend/src/utils/urlParams.ts",
     "project_state.json"

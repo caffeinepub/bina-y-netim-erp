@@ -1,92 +1,90 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-19T00:19:59.900Z",
+  "generatedAt": "2026-02-19T01:50:37.746Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 6,
+    "total": 5,
     "implemented": 5,
     "items": [
       {
-        "id": "REQ-83",
-        "summary": "Update the ResidentDashboard component (frontend/src/pages/ResidentDashboard.tsx) to display a comprehensive announcements list section showing all building announcements with title (baslik), description (aciklama), creation date, and creator information in a card-based layout with proper spacing and Turkish section header 'Duyurular'",
+        "id": "REQ-92",
+        "summary": "Debug and fix the post-authentication routing flow in frontend/src/App.tsx to ensure users are correctly redirected to their role-specific dashboards (OwnerDashboard, ManagerDashboard, or ResidentDashboard) after Internet Identity authentication completes, preventing the blank screen issue",
         "status": "implemented",
         "plannedFiles": [
+          "frontend/src/App.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/App.tsx"
+        ]
+      },
+      {
+        "id": "REQ-93",
+        "summary": "Verify that the user profile query in frontend/src/App.tsx properly fetches the authenticated user's role and building association immediately after Internet Identity authentication, with proper error handling for failed profile fetches",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/hooks/useQueries.ts",
+          "frontend/src/App.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/hooks/useQueries.ts",
+          "frontend/src/App.tsx"
+        ]
+      },
+      {
+        "id": "REQ-94",
+        "summary": "Add defensive checks in the role-specific dashboard components (OwnerDashboard.tsx, ManagerDashboard.tsx, ResidentDashboard.tsx) to handle cases where user profile data is missing or incomplete, displaying appropriate loading states or error messages in Turkish",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/pages/OwnerDashboard.tsx",
+          "frontend/src/pages/ManagerDashboard.tsx",
           "frontend/src/pages/ResidentDashboard.tsx"
         ],
         "matchedFiles": [
+          "frontend/src/pages/OwnerDashboard.tsx",
+          "frontend/src/pages/ManagerDashboard.tsx",
           "frontend/src/pages/ResidentDashboard.tsx"
         ]
       },
       {
-        "id": "REQ-84",
-        "summary": "Create an issue reporting form component (IssueReportForm.tsx) in the frontend that allows SAKIN users to report building issues/faults with input fields for baslik (title), aciklama (description), and daireId (apartment selection via dropdown), form validation, and success/error feedback in Turkish",
+        "id": "REQ-95",
+        "summary": "Fix the onboarding flow handling in frontend/src/pages/Home.tsx to ensure the component properly renders onboarding UI for new users without buildings, and role-based dashboard content for existing users with building assignments",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/components/IssueReportForm.tsx"
+          "frontend/src/pages/Home.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/components/IssueReportForm.tsx"
+          "frontend/src/pages/Home.tsx"
         ]
       },
       {
-        "id": "REQ-85",
-        "summary": "Implement backend function arizaBildir(baslik: Text, aciklama: Text, daireId: Text) in backend/main.mo that creates a new Ariza record for the authenticated user's building, validates that the user has SAKIN role, generates a unique arizaId, stores it with status 'Açık' (open), and returns the created issue or appropriate error",
-        "status": "unknown",
-        "plannedFiles": [],
-        "matchedFiles": []
-      },
-      {
-        "id": "REQ-86",
-        "summary": "Create React Query mutation hook useReportIssue in frontend/src/hooks/useQueries.ts that calls the arizaBildir backend function, handles loading states, and invalidates the 'issues' query cache on successful issue creation",
+        "id": "REQ-96",
+        "summary": "Verify that the React Query cache invalidation logic properly refreshes user profile data after building creation, invite code registration, and role assignment operations to ensure UI updates reflect the latest user state",
         "status": "implemented",
         "plannedFiles": [
+          "frontend/src/hooks/useQueries.ts",
+          "frontend/src/components/BuildingCreateForm.tsx",
+          "frontend/src/components/InviteCodeRegistration.tsx"
+        ],
+        "matchedFiles": [
           "frontend/src/hooks/useQueries.ts"
-        ],
-        "matchedFiles": [
-          "frontend/src/hooks/useQueries.ts"
-        ]
-      },
-      {
-        "id": "REQ-87",
-        "summary": "Integrate the IssueReportForm component into the ResidentDashboard page with a clear Turkish section header 'Arıza Bildir', positioned below the announcements section with consistent spacing and layout matching OwnerDashboard patterns",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/pages/ResidentDashboard.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/pages/ResidentDashboard.tsx"
-        ]
-      },
-      {
-        "id": "REQ-88",
-        "summary": "Update the ResidentDashboard layout to organize the two feature sections (announcements display and issue reporting) in a clear, scannable two-column or stacked layout with proper card containers, consistent with OwnerDashboard and ManagerDashboard design patterns",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/pages/ResidentDashboard.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/pages/ResidentDashboard.tsx"
         ]
       }
     ]
   },
   "changedFiles": [
-    "backend/main.mo",
-    "backend/migration.mo",
     "build-request.json",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/backend.d.ts",
-    "frontend/src/backend.ts",
-    "frontend/src/components/IssueReportForm.tsx",
-    "frontend/src/declarations/backend.did.d.ts",
-    "frontend/src/declarations/backend.did.js",
+    "frontend/src/App.tsx",
     "frontend/src/hooks/useQueries.ts",
+    "frontend/src/pages/Home.tsx",
+    "frontend/src/pages/ManagerDashboard.tsx",
+    "frontend/src/pages/OwnerDashboard.tsx",
     "frontend/src/pages/ResidentDashboard.tsx",
     "frontend/src/utils/urlParams.ts",
     "project_state.json",

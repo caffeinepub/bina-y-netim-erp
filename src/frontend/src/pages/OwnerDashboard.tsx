@@ -1,5 +1,5 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Building2, Users, TrendingUp, UserPlus, Shield, Home, Megaphone, LayoutGrid } from 'lucide-react';
+import { Building2, Users, TrendingUp, UserPlus, Shield, Home, Megaphone, LayoutGrid, AlertCircle } from 'lucide-react';
 import { useGetUserBuilding, useGetCallerUserProfile, useGetInviteCodes } from '@/hooks/useQueries';
 import InviteCodePanel from '@/components/InviteCodePanel';
 import BuildingUsersList from '@/components/BuildingUsersList';
@@ -10,18 +10,24 @@ import AnnouncementsList from '@/components/AnnouncementsList';
 import DaireGorunumu from '@/components/DaireGorunumu';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { getRoleDisplayName, getRoleVariant } from '@/utils/roleTranslations';
 
 export default function OwnerDashboard() {
-  const { data: building, isLoading: buildingLoading } = useGetUserBuilding();
-  const { data: userProfile, isLoading: profileLoading } = useGetCallerUserProfile();
+  const { data: building, isLoading: buildingLoading, error: buildingError } = useGetUserBuilding();
+  const { data: userProfile, isLoading: profileLoading, isFetched: profileFetched, error: profileError } = useGetCallerUserProfile();
   const { data: inviteCodes } = useGetInviteCodes();
 
-  const totalInviteCodes = inviteCodes?.length || 0;
-  const usedInviteCodes = inviteCodes?.filter(code => code.kullanildiMi).length || 0;
-  const activeInviteCodes = totalInviteCodes - usedInviteCodes;
-  const totalMembers = 1 + usedInviteCodes;
+  console.log('OwnerDashboard: Render state', {
+    profileLoading,
+    profileFetched,
+    hasProfile: !!userProfile,
+    buildingLoading,
+    hasBuilding: !!building,
+    binaId: userProfile?.binaId,
+  });
 
+  // Show loading skeleton while data is being fetched
   if (buildingLoading || profileLoading) {
     return (
       <div className="container mx-auto px-4 py-8 space-y-6">
@@ -35,6 +41,41 @@ export default function OwnerDashboard() {
       </div>
     );
   }
+
+  // Show error if profile fetch failed
+  if (profileError || !userProfile) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Profil Yüklenemedi</AlertTitle>
+          <AlertDescription>
+            Kullanıcı profili yüklenirken bir hata oluştu. Lütfen tekrar giriş yapın.
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
+  }
+
+  // Show error if building data is missing
+  if (!userProfile.binaId) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Bina Bilgisi Yok</AlertTitle>
+          <AlertDescription>
+            Hesabınıza bağlı bir bina bulunamadı. Lütfen ana sayfadan bir bina oluşturun.
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
+  }
+
+  const totalInviteCodes = inviteCodes?.length || 0;
+  const usedInviteCodes = inviteCodes?.filter(code => code.kullanildiMi).length || 0;
+  const activeInviteCodes = totalInviteCodes - usedInviteCodes;
+  const totalMembers = 1 + usedInviteCodes;
 
   return (
     <div className="container mx-auto px-4 py-8 space-y-8">
@@ -61,7 +102,7 @@ export default function OwnerDashboard() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Building2 className="h-5 w-5 text-primary" />
-            {building?.binaAdi}
+            {building?.binaAdi || 'Bina Adı Yükleniyor...'}
           </CardTitle>
           <CardDescription>
             Bina yönetim sisteminiz aktif ve çalışıyor
@@ -72,11 +113,11 @@ export default function OwnerDashboard() {
             <div className="space-y-1">
               <p className="text-sm text-muted-foreground">Oluşturulma Tarihi</p>
               <p className="text-sm font-medium">
-                {building && new Date(Number(building.olusturulmaTarihi) / 1000000).toLocaleDateString('tr-TR', {
+                {building ? new Date(Number(building.olusturulmaTarihi) / 1000000).toLocaleDateString('tr-TR', {
                   year: 'numeric',
                   month: 'long',
                   day: 'numeric',
-                })}
+                }) : '-'}
               </p>
             </div>
             <div className="space-y-1">

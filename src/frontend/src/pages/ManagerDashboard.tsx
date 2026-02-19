@@ -5,18 +5,25 @@ import InviteCodePanel from '@/components/InviteCodePanel';
 import IssuesList from '@/components/IssuesList';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { getRoleDisplayName, getRoleVariant } from '@/utils/roleTranslations';
 import { Role } from '@/backend';
 
 export default function ManagerDashboard() {
-  const { data: building, isLoading: buildingLoading } = useGetUserBuilding();
-  const { data: userProfile, isLoading: profileLoading } = useGetCallerUserProfile();
+  const { data: building, isLoading: buildingLoading, error: buildingError } = useGetUserBuilding();
+  const { data: userProfile, isLoading: profileLoading, isFetched: profileFetched, error: profileError } = useGetCallerUserProfile();
   const { data: inviteCodes } = useGetInviteCodes();
 
-  const totalInviteCodes = inviteCodes?.length || 0;
-  const usedInviteCodes = inviteCodes?.filter(code => code.kullanildiMi).length || 0;
-  const activeInviteCodes = totalInviteCodes - usedInviteCodes;
+  console.log('ManagerDashboard: Render state', {
+    profileLoading,
+    profileFetched,
+    hasProfile: !!userProfile,
+    buildingLoading,
+    hasBuilding: !!building,
+    binaId: userProfile?.binaId,
+  });
 
+  // Show loading skeleton while data is being fetched
   if (buildingLoading || profileLoading) {
     return (
       <div className="container mx-auto px-4 py-8 space-y-6">
@@ -29,6 +36,40 @@ export default function ManagerDashboard() {
       </div>
     );
   }
+
+  // Show error if profile fetch failed
+  if (profileError || !userProfile) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Profil Yüklenemedi</AlertTitle>
+          <AlertDescription>
+            Kullanıcı profili yüklenirken bir hata oluştu. Lütfen tekrar giriş yapın.
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
+  }
+
+  // Show error if building data is missing
+  if (!userProfile.binaId) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Bina Bilgisi Yok</AlertTitle>
+          <AlertDescription>
+            Hesabınıza bağlı bir bina bulunamadı. Lütfen yöneticinizle iletişime geçin.
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
+  }
+
+  const totalInviteCodes = inviteCodes?.length || 0;
+  const usedInviteCodes = inviteCodes?.filter(code => code.kullanildiMi).length || 0;
+  const activeInviteCodes = totalInviteCodes - usedInviteCodes;
 
   return (
     <div className="container mx-auto px-4 py-8 space-y-8">
@@ -55,7 +96,7 @@ export default function ManagerDashboard() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Building2 className="h-5 w-5 text-purple-600" />
-            {building?.binaAdi}
+            {building?.binaAdi || 'Bina Adı Yükleniyor...'}
           </CardTitle>
           <CardDescription>
             Yetkili olarak yönetim görevlerinizi buradan gerçekleştirebilirsiniz

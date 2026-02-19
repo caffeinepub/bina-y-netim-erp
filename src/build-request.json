@@ -1,141 +1,117 @@
 {
   "kind": "build_request",
-  "title": "Add Resident Dashboard features: announcements display and issue reporting",
+  "title": "Fix blank screen after login - display role-specific dashboard content",
   "projectName": "Bina Yönetim ERP",
-  "priority": "normal",
+  "priority": "high",
   "requirements": [
     {
-      "id": "REQ-83",
-      "text": "Update the ResidentDashboard component (frontend/src/pages/ResidentDashboard.tsx) to display a comprehensive announcements list section showing all building announcements with title (baslik), description (aciklama), creation date, and creator information in a card-based layout with proper spacing and Turkish section header 'Duyurular'",
+      "id": "REQ-92",
+      "text": "Debug and fix the post-authentication routing flow in frontend/src/App.tsx to ensure users are correctly redirected to their role-specific dashboards (OwnerDashboard, ManagerDashboard, or ResidentDashboard) after Internet Identity authentication completes, preventing the blank screen issue",
       "target": "frontend",
       "source": {
         "messageIds": [
           "msg-latest"
         ],
         "quotes": [
-          "ekle",
-          "Sakin Panelini ekleyelim mi? (Duyuruları görme, arıza bildirme)"
+          "hala giriş yaptıktan sonraki wkran boş geliyot"
         ]
       },
       "acceptanceCriteria": [
-        "AnnouncementsList component is integrated into ResidentDashboard",
-        "Announcements are displayed in card format with all required fields",
-        "Section has clear Turkish header 'Duyurular'",
-        "Loading and error states are handled properly",
-        "Empty state message is shown when no announcements exist"
+        "After successful Internet Identity login, users with BINA_SAHIBI role are redirected to /owner-dashboard and see dashboard content",
+        "After successful Internet Identity login, users with YETKILI role are redirected to /manager-dashboard and see dashboard content",
+        "After successful Internet Identity login, users with SAKIN role are redirected to /resident-dashboard and see dashboard content",
+        "No blank screen appears after authentication completes",
+        "Console logs track the authentication state, user role fetching, and routing decisions for debugging"
       ]
     },
     {
-      "id": "REQ-84",
-      "text": "Create an issue reporting form component (IssueReportForm.tsx) in the frontend that allows SAKIN users to report building issues/faults with input fields for baslik (title), aciklama (description), and daireId (apartment selection via dropdown), form validation, and success/error feedback in Turkish",
+      "id": "REQ-93",
+      "text": "Verify that the user profile query in frontend/src/App.tsx properly fetches the authenticated user's role and building association immediately after Internet Identity authentication, with proper error handling for failed profile fetches",
       "target": "frontend",
       "source": {
         "messageIds": [
           "msg-latest"
         ],
         "quotes": [
-          "arıza bildirme"
+          "hala giriş yaptıktan sonraki wkran boş geliyot"
         ]
       },
       "acceptanceCriteria": [
-        "Form component accepts title, description, and apartment selection",
-        "Apartment dropdown is populated from useListApartments query",
-        "Form validation ensures all required fields are filled",
-        "Success toast shows 'Arıza başarıyla bildirildi' message",
-        "Error toast shows appropriate Turkish error messages",
-        "Form resets after successful submission"
+        "User profile data (including role and binaId) is fetched immediately after authentication",
+        "Profile fetch errors are logged and displayed to users in Turkish",
+        "Loading states are properly handled while profile data is being fetched",
+        "Role-based routing waits for profile data before making redirect decisions"
       ]
     },
     {
-      "id": "REQ-85",
-      "text": "Implement backend function arizaBildir(baslik: Text, aciklama: Text, daireId: Text) in backend/main.mo that creates a new Ariza record for the authenticated user's building, validates that the user has SAKIN role, generates a unique arizaId, stores it with status 'Açık' (open), and returns the created issue or appropriate error",
-      "target": "backend",
-      "source": {
-        "messageIds": [
-          "msg-latest"
-        ],
-        "quotes": [
-          "arıza bildirme"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Function validates caller is authenticated and has a building assignment",
-        "Function validates caller has SAKIN role (or allows YETKILI/BINA_SAHIBI as well)",
-        "Unique arizaId is generated for each issue",
-        "Issue is stored with bildirenPrincipal set to caller's principal",
-        "Initial status is set to 'Açık'",
-        "Function returns success with created issue or error with Turkish message"
-      ]
-    },
-    {
-      "id": "REQ-86",
-      "text": "Create React Query mutation hook useReportIssue in frontend/src/hooks/useQueries.ts that calls the arizaBildir backend function, handles loading states, and invalidates the 'issues' query cache on successful issue creation",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-latest"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Hook uses useMutation from React Query",
-        "Mutation calls backend arizaBildir function with provided parameters",
-        "On success, invalidates 'issues' query cache to refresh issue lists",
-        "Returns proper loading, error, and success states",
-        "Error messages are properly propagated for display"
-      ]
-    },
-    {
-      "id": "REQ-87",
-      "text": "Integrate the IssueReportForm component into the ResidentDashboard page with a clear Turkish section header 'Arıza Bildir', positioned below the announcements section with consistent spacing and layout matching OwnerDashboard patterns",
+      "id": "REQ-94",
+      "text": "Add defensive checks in the role-specific dashboard components (OwnerDashboard.tsx, ManagerDashboard.tsx, ResidentDashboard.tsx) to handle cases where user profile data is missing or incomplete, displaying appropriate loading states or error messages in Turkish",
       "target": "frontend",
       "source": {
         "messageIds": [
           "msg-latest"
         ],
         "quotes": [
-          "arıza bildirme"
+          "hala giriş yaptıktan sonraki wkran boş geliyot"
         ]
       },
       "acceptanceCriteria": [
-        "IssueReportForm is displayed in ResidentDashboard",
-        "Section header 'Arıza Bildir' is clear and prominent",
-        "Form is positioned logically after announcements section",
-        "Spacing and layout are consistent with other dashboard pages",
-        "Form is responsive and works on mobile devices"
+        "Dashboard components display loading skeletons while profile data is being fetched",
+        "Dashboard components show Turkish error messages when profile data fails to load",
+        "Dashboard components gracefully handle null/undefined user data",
+        "Users see meaningful feedback instead of blank screens"
       ]
     },
     {
-      "id": "REQ-88",
-      "text": "Update the ResidentDashboard layout to organize the two feature sections (announcements display and issue reporting) in a clear, scannable two-column or stacked layout with proper card containers, consistent with OwnerDashboard and ManagerDashboard design patterns",
+      "id": "REQ-95",
+      "text": "Fix the onboarding flow handling in frontend/src/pages/Home.tsx to ensure the component properly renders onboarding UI for new users without buildings, and role-based dashboard content for existing users with building assignments",
       "target": "frontend",
       "source": {
         "messageIds": [
           "msg-latest"
+        ],
+        "quotes": [
+          "hala giriş yaptıktan sonraki wkran boş geliyot"
         ]
       },
       "acceptanceCriteria": [
-        "Layout uses consistent card/section containers",
-        "Sections are clearly separated with appropriate spacing",
-        "Design matches patterns from OwnerDashboard and ManagerDashboard",
-        "Layout is responsive and adapts to different screen sizes",
-        "All text labels are in Turkish"
+        "New users without building assignment see the onboarding section with 'Bina Oluştur' or 'Davet Kodu Gir' options",
+        "Users with building assignment and valid roles see appropriate role-based content",
+        "Home page does not render blank when user profile is loaded",
+        "Session storage onboarding flow values are properly retrieved and used"
+      ]
+    },
+    {
+      "id": "REQ-96",
+      "text": "Verify that the React Query cache invalidation logic properly refreshes user profile data after building creation, invite code registration, and role assignment operations to ensure UI updates reflect the latest user state",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-latest"
+        ],
+        "quotes": [
+          "hala giriş yaptıktan sonraki wkran boş geliyot"
+        ]
+      },
+      "acceptanceCriteria": [
+        "After building creation, user profile is re-fetched and UI updates to show role-based dashboard",
+        "After invite code registration, user profile is re-fetched and UI updates to show role-based dashboard",
+        "Cache invalidation occurs automatically after successful mutations",
+        "No manual page refresh is required to see updated user state"
       ]
     }
   ],
   "constraints": [
-    "Do not modify backend/main.mo actor architecture - maintain single-actor pattern",
-    "Do not modify immutable frontend paths: useInternetIdentity hooks, useActor.ts, main.tsx, or components/ui directory",
-    "Maintain Turkish language for all user-facing text",
-    "Follow existing role-based permission patterns from BINA_SAHIBI and YETKILI implementations"
+    "Do not modify backend/main.mo authentication or user profile logic",
+    "Do not change the Internet Identity integration in frontend/src/hooks/useInternetIdentity.ts",
+    "Maintain existing Turkish language labels and error messages",
+    "Keep role-based access control permissions as currently defined"
   ],
   "nonGoals": [
-    "Issue editing or deletion functionality",
-    "Issue status management (marking as resolved/closed)",
-    "Issue assignment to specific users",
-    "Issue priority levels or categories",
-    "Notification system for new issues",
-    "File attachments for issues",
-    "Comments or discussion threads on issues"
+    "Adding new authentication methods beyond Internet Identity",
+    "Changing the role hierarchy or permission system",
+    "Redesigning dashboard layouts or visual components",
+    "Adding new features to dashboards"
   ],
   "imageRequirements": {
     "required": [],

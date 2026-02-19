@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 33,
+  "projectStateVersion": 37,
   "summary": "Bina Yönetim ERP Uygulaması - Multi-tenant, rol bazlı bina yönetim sistemi. Internet Identity tek kimlik doğrulama yöntemi. Davet kodu giriş yöntemi değil, rol ve bina eşleştirme aracıdır. Kullanıcılar Internet Identity ile giriş yapar, binaya bağlı değilse davet kodu girer veya bina oluşturur. Onboarding akışı: Bina Sahibi (bina oluşturma), Yetkili (davet kodu), Sakin/Personel (davet kodu). Login ekranında 3 farklı onboarding akışı seçeneği aynı anda gösterilecek.",
   "architectural_notes": [
     "Internet Identity tek kimlik doğrulama yöntemi",
@@ -14,8 +14,12 @@
     "Multi-tenant yapı öncelikli: Tenant yapısı rol ve davet sisteminden önce kurulmalı",
     "Internet Identity = Kimlik doğrulama (tek giriş yöntemi)"
   ],
-  "known_issues": [],
-  "isFixRequest": false,
+  "known_issues": [
+    "Onboarding flow state management issue: mode is set to 'building-owner' then immediately cleared, causing the onboarding section to render with mode=null instead of showing the building creation form",
+    "Login page onboarding flow persistence: session storage correctly stores 'building-owner' but Home component clears it before using it to determine which onboarding UI to display",
+    "Post-login screen appears blank/empty for users after Internet Identity authentication completes"
+  ],
+  "isFixRequest": true,
   "existing_features": [
     {
       "id": "feature-implement-internet-identity-authentication-system-that-allows-users-to-log-in-using-their-internet-identity-principal",
@@ -510,6 +514,70 @@
       "title": "Update the ResidentDashboard layout to organize the two feature sections (announcements display and issue reporting) in a clear, scannable two-column or stacked layout with proper card containers, consistent with OwnerDashboard and ManagerDashboard design patterns",
       "reqIds": [
         "REQ-88"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-fix-the-race-condition-in-frontend-src-pages-home-tsx-where-the-onboarding-flow-mode-is-retrieved-from-session-storage-set-to-component-state-then-immediately-cleared-from-storage-before-the-component-can-use-it-to-render-the-appropriate-onboarding-ui-ensure-the-mode-persists-in-component-state-long-enough-to-render-the-correct-onboarding-section-building-creation-form-for-building-owner-flow-invite-code-entry-for-authority-and-resident-flows",
+      "title": "Fix the race condition in frontend/src/pages/Home.tsx where the onboarding flow mode is retrieved from session storage, set to component state, then immediately cleared from storage before the component can use it to render the appropriate onboarding UI. Ensure the mode persists in component state long enough to render the correct onboarding section (building creation form for 'building-owner' flow, invite code entry for 'authority' and 'resident' flows).",
+      "reqIds": [
+        "REQ-89"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-useeffect-hook-timing-in-frontend-src-pages-home-tsx-to-prevent-the-onboarding-flow-from-being-cleared-from-session-storage-before-the-component-state-is-updated-ensure-the-clearonboardingflow-call-only-happens-after-the-onboarding-mode-has-been-successfully-set-in-local-component-state",
+      "title": "Update the useEffect hook timing in frontend/src/pages/Home.tsx to prevent the onboarding flow from being cleared from session storage before the component state is updated. Ensure the clearOnboardingFlow() call only happens after the onboarding mode has been successfully set in local component state.",
+      "reqIds": [
+        "REQ-90"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-defensive-checks-in-the-home-page-onboarding-section-rendering-logic-to-handle-the-case-where-mode-is-null-but-the-user-has-selected-an-onboarding-flow-if-mode-is-null-attempt-to-retrieve-the-flow-from-session-storage-one-more-time-before-rendering-the-default-state",
+      "title": "Add defensive checks in the Home page onboarding section rendering logic to handle the case where mode is null but the user has selected an onboarding flow. If mode is null, attempt to retrieve the flow from session storage one more time before rendering the default state.",
+      "reqIds": [
+        "REQ-91"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-debug-and-fix-the-post-authentication-routing-flow-in-frontend-src-app-tsx-to-ensure-users-are-correctly-redirected-to-their-role-specific-dashboards-ownerdashboard-managerdashboard-or-residentdashboard-after-internet-identity-authentication-completes-preventing-the-blank-screen-issue",
+      "title": "Debug and fix the post-authentication routing flow in frontend/src/App.tsx to ensure users are correctly redirected to their role-specific dashboards (OwnerDashboard, ManagerDashboard, or ResidentDashboard) after Internet Identity authentication completes, preventing the blank screen issue",
+      "reqIds": [
+        "REQ-92"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-verify-that-the-user-profile-query-in-frontend-src-app-tsx-properly-fetches-the-authenticated-user-s-role-and-building-association-immediately-after-internet-identity-authentication-with-proper-error-handling-for-failed-profile-fetches",
+      "title": "Verify that the user profile query in frontend/src/App.tsx properly fetches the authenticated user's role and building association immediately after Internet Identity authentication, with proper error handling for failed profile fetches",
+      "reqIds": [
+        "REQ-93"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-defensive-checks-in-the-role-specific-dashboard-components-ownerdashboard-tsx-managerdashboard-tsx-residentdashboard-tsx-to-handle-cases-where-user-profile-data-is-missing-or-incomplete-displaying-appropriate-loading-states-or-error-messages-in-turkish",
+      "title": "Add defensive checks in the role-specific dashboard components (OwnerDashboard.tsx, ManagerDashboard.tsx, ResidentDashboard.tsx) to handle cases where user profile data is missing or incomplete, displaying appropriate loading states or error messages in Turkish",
+      "reqIds": [
+        "REQ-94"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-fix-the-onboarding-flow-handling-in-frontend-src-pages-home-tsx-to-ensure-the-component-properly-renders-onboarding-ui-for-new-users-without-buildings-and-role-based-dashboard-content-for-existing-users-with-building-assignments",
+      "title": "Fix the onboarding flow handling in frontend/src/pages/Home.tsx to ensure the component properly renders onboarding UI for new users without buildings, and role-based dashboard content for existing users with building assignments",
+      "reqIds": [
+        "REQ-95"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-verify-that-the-react-query-cache-invalidation-logic-properly-refreshes-user-profile-data-after-building-creation-invite-code-registration-and-role-assignment-operations-to-ensure-ui-updates-reflect-the-latest-user-state",
+      "title": "Verify that the React Query cache invalidation logic properly refreshes user profile data after building creation, invite code registration, and role assignment operations to ensure UI updates reflect the latest user state",
+      "reqIds": [
+        "REQ-96"
       ],
       "version": 1
     }
