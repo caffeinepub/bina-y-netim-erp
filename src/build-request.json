@@ -1,32 +1,75 @@
 {
   "kind": "build_request",
-  "title": "Create visual apartment layout grid component in Owner Dashboard",
+  "title": "Add Resident Dashboard features: announcements display and issue reporting",
   "projectName": "Bina Yönetim ERP",
   "priority": "normal",
   "requirements": [
     {
-      "id": "REQ-79",
-      "text": "Create a visual apartment layout grid component (DaireGorunumu.tsx) in the frontend that displays all apartments in an interactive grid/card layout, showing apartment name/number (daireAdi) on each card",
+      "id": "REQ-83",
+      "text": "Update the ResidentDashboard component (frontend/src/pages/ResidentDashboard.tsx) to display a comprehensive announcements list section showing all building announcements with title (baslik), description (aciklama), creation date, and creator information in a card-based layout with proper spacing and Turkish section header 'Duyurular'",
       "target": "frontend",
       "source": {
         "messageIds": [
           "msg-latest"
         ],
         "quotes": [
-          "Daire Görünümü - En son görselleştirme  bunu da yap"
+          "ekle",
+          "Sakin Panelini ekleyelim mi? (Duyuruları görme, arıza bildirme)"
         ]
       },
       "acceptanceCriteria": [
-        "Component displays apartments in a responsive grid layout (e.g., 3-4 columns on desktop, 2 on tablet, 1 on mobile)",
-        "Each apartment is rendered as a card showing daireAdi prominently",
-        "Grid uses consistent spacing and styling matching OwnerDashboard patterns",
-        "Component integrates with useListApartments React Query hook to fetch apartment data",
-        "Loading and empty states are handled with appropriate Turkish messages"
+        "AnnouncementsList component is integrated into ResidentDashboard",
+        "Announcements are displayed in card format with all required fields",
+        "Section has clear Turkish header 'Duyurular'",
+        "Loading and error states are handled properly",
+        "Empty state message is shown when no announcements exist"
       ]
     },
     {
-      "id": "REQ-80",
-      "text": "Integrate the DaireGorunumu component into the OwnerDashboard page (frontend/src/pages/OwnerDashboard.tsx) as a new section titled 'Daire Görünümü' positioned after the existing apartment management section",
+      "id": "REQ-84",
+      "text": "Create an issue reporting form component (IssueReportForm.tsx) in the frontend that allows SAKIN users to report building issues/faults with input fields for baslik (title), aciklama (description), and daireId (apartment selection via dropdown), form validation, and success/error feedback in Turkish",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-latest"
+        ],
+        "quotes": [
+          "arıza bildirme"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Form component accepts title, description, and apartment selection",
+        "Apartment dropdown is populated from useListApartments query",
+        "Form validation ensures all required fields are filled",
+        "Success toast shows 'Arıza başarıyla bildirildi' message",
+        "Error toast shows appropriate Turkish error messages",
+        "Form resets after successful submission"
+      ]
+    },
+    {
+      "id": "REQ-85",
+      "text": "Implement backend function arizaBildir(baslik: Text, aciklama: Text, daireId: Text) in backend/main.mo that creates a new Ariza record for the authenticated user's building, validates that the user has SAKIN role, generates a unique arizaId, stores it with status 'Açık' (open), and returns the created issue or appropriate error",
+      "target": "backend",
+      "source": {
+        "messageIds": [
+          "msg-latest"
+        ],
+        "quotes": [
+          "arıza bildirme"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Function validates caller is authenticated and has a building assignment",
+        "Function validates caller has SAKIN role (or allows YETKILI/BINA_SAHIBI as well)",
+        "Unique arizaId is generated for each issue",
+        "Issue is stored with bildirenPrincipal set to caller's principal",
+        "Initial status is set to 'Açık'",
+        "Function returns success with created issue or error with Turkish message"
+      ]
+    },
+    {
+      "id": "REQ-86",
+      "text": "Create React Query mutation hook useReportIssue in frontend/src/hooks/useQueries.ts that calls the arizaBildir backend function, handles loading states, and invalidates the 'issues' query cache on successful issue creation",
       "target": "frontend",
       "source": {
         "messageIds": [
@@ -34,15 +77,36 @@
         ]
       },
       "acceptanceCriteria": [
-        "New section appears in OwnerDashboard with Turkish header 'Daire Görünümü'",
-        "Section is positioned logically within the dashboard layout with consistent spacing",
-        "Visual grid component displays all apartments from the building",
-        "Section maintains responsive design consistent with other dashboard sections"
+        "Hook uses useMutation from React Query",
+        "Mutation calls backend arizaBildir function with provided parameters",
+        "On success, invalidates 'issues' query cache to refresh issue lists",
+        "Returns proper loading, error, and success states",
+        "Error messages are properly propagated for display"
       ]
     },
     {
-      "id": "REQ-81",
-      "text": "Add visual indicators to apartment cards showing occupancy status: display a subtle badge or icon indicating whether the apartment is assigned to a user (based on checking if any user's daireId matches the apartment's daireId)",
+      "id": "REQ-87",
+      "text": "Integrate the IssueReportForm component into the ResidentDashboard page with a clear Turkish section header 'Arıza Bildir', positioned below the announcements section with consistent spacing and layout matching OwnerDashboard patterns",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-latest"
+        ],
+        "quotes": [
+          "arıza bildirme"
+        ]
+      },
+      "acceptanceCriteria": [
+        "IssueReportForm is displayed in ResidentDashboard",
+        "Section header 'Arıza Bildir' is clear and prominent",
+        "Form is positioned logically after announcements section",
+        "Spacing and layout are consistent with other dashboard pages",
+        "Form is responsive and works on mobile devices"
+      ]
+    },
+    {
+      "id": "REQ-88",
+      "text": "Update the ResidentDashboard layout to organize the two feature sections (announcements display and issue reporting) in a clear, scannable two-column or stacked layout with proper card containers, consistent with OwnerDashboard and ManagerDashboard design patterns",
       "target": "frontend",
       "source": {
         "messageIds": [
@@ -50,40 +114,28 @@
         ]
       },
       "acceptanceCriteria": [
-        "Each apartment card shows occupancy status (Boş/Dolu) with appropriate visual styling",
-        "Occupied apartments display a different badge variant (e.g., success/primary) than vacant ones (e.g., secondary/outline)",
-        "Component cross-references apartment data with building user list to determine occupancy",
-        "Status indicator uses Turkish labels ('Boş' for vacant, 'Dolu' for occupied)"
-      ]
-    },
-    {
-      "id": "REQ-82",
-      "text": "Implement hover interactions on apartment cards that display additional information in a tooltip or popover, including creation date (olusturmaTarihi) formatted in Turkish locale",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-latest"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Hovering over an apartment card reveals additional details in a tooltip/popover",
-        "Tooltip displays formatted creation date using Turkish date formatting",
-        "Hover effect uses smooth transitions consistent with existing UI patterns",
-        "Tooltip/popover styling matches shadcn/ui component library patterns"
+        "Layout uses consistent card/section containers",
+        "Sections are clearly separated with appropriate spacing",
+        "Design matches patterns from OwnerDashboard and ManagerDashboard",
+        "Layout is responsive and adapts to different screen sizes",
+        "All text labels are in Turkish"
       ]
     }
   ],
   "constraints": [
-    "Do not modify the existing ApartmentsList.tsx table component - create a separate visualization component",
-    "Maintain read-only status for files in frontend/src/components/ui and other immutable paths",
-    "Use existing React Query hooks (useListApartments, useListBuildingUsers) without modification",
-    "Follow the existing Turkish UI text conventions throughout the component"
+    "Do not modify backend/main.mo actor architecture - maintain single-actor pattern",
+    "Do not modify immutable frontend paths: useInternetIdentity hooks, useActor.ts, main.tsx, or components/ui directory",
+    "Maintain Turkish language for all user-facing text",
+    "Follow existing role-based permission patterns from BINA_SAHIBI and YETKILI implementations"
   ],
   "nonGoals": [
-    "Interactive floor plan editor or drag-and-drop apartment arrangement",
-    "Apartment editing or deletion functionality from the visual grid",
-    "User assignment interface within the apartment cards",
-    "3D visualization or complex architectural layouts"
+    "Issue editing or deletion functionality",
+    "Issue status management (marking as resolved/closed)",
+    "Issue assignment to specific users",
+    "Issue priority levels or categories",
+    "Notification system for new issues",
+    "File attachments for issues",
+    "Comments or discussion threads on issues"
   ],
   "imageRequirements": {
     "required": [],

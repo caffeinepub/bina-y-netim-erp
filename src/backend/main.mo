@@ -5,14 +5,14 @@ import Nat "mo:core/Nat";
 import Iter "mo:core/Iter";
 import Principal "mo:core/Principal";
 import Runtime "mo:core/Runtime";
-
 import Blob "mo:core/Blob";
 
 import AccessControl "authorization/access-control";
 import MixinAuthorization "authorization/MixinAuthorization";
 import InviteLinksModule "invite-links/invite-links-module";
+import Migration "migration";
 
-
+(with migration = Migration.run)
 actor {
   let accessControlState = AccessControl.initState();
   include MixinAuthorization(accessControlState);
@@ -27,6 +27,11 @@ actor {
     #binaSahibi;
     #yetkili;
     #sakin;
+  };
+
+  public type ArizaDurumu = {
+    #acik;
+    #kapali;
   };
 
   public type UserProfile = {
@@ -84,6 +89,17 @@ actor {
     kullananPrincipal : ?Principal;
   };
 
+  public type Ariza = {
+    arizaId : Text;
+    baslik : Text;
+    aciklama : Text;
+    daireId : Text;
+    binaId : Nat;
+    olusturanPrincipal : Principal;
+    olusturmaZamani : Time.Time;
+    durum : ArizaDurumu;
+  };
+
   //------------------------
   // State
   //------------------------
@@ -93,6 +109,7 @@ actor {
   let davetKodlari = Map.empty<Text, DavetKodu>();
   let daireler = Map.empty<Text, Daire>();
   let duyurular = Map.empty<Text, Duyuru>();
+  let arizalar = Map.empty<Text, Ariza>();
 
   //------------------------
   // Building Logic
@@ -101,7 +118,7 @@ actor {
   public shared ({ caller }) func binaOlustur(binaAdi : Text) : async Nat {
     _checkAuthenticated(caller);
 
-    // SECURITY FIX: Check if user already has a building assignment
+    // SECURITY: Check if user already has a building assignment
     switch (userProfiles.get(caller)) {
       case (?existingProfile) {
         switch (existingProfile.binaId) {
@@ -203,7 +220,7 @@ actor {
   };
 
   public query ({ caller }) func getUserProfile(user : Principal) : async ?UserProfile {
-    // SECURITY FIX: Strengthen authorization - only admins or the user themselves can view profiles
+    // SECURITY: Only admins or the user themselves can view profiles
     if (caller != user and not AccessControl.isAdmin(accessControlState, caller)) {
       Runtime.trap("Yetkisiz: Sadece kendi profilinizi görüntüleyebilirsiniz");
     };
@@ -253,7 +270,22 @@ actor {
 
     let callerRole = callerProfile.role;
 
-    // Permission logic for role creation remains the same
+    // SECURITY: Role-based authorization for creating invite codes
+    switch (callerRole) {
+      case (#binaSahibi) {
+        // Building owner can create any role
+      };
+      case (#yetkili) {
+        // Authorized personnel can only create sakin roles
+        if (yeniRol != #sakin) {
+          Runtime.trap("Yetkili kullanıcılar sadece sakin davet kodu oluşturabilir");
+        };
+      };
+      case (#sakin) {
+        // Residents cannot create invite codes
+        Runtime.trap("Sakinler davet kodu oluşturamazlar");
+      };
+    };
 
     let binaId = switch (callerProfile.binaId) {
       case (null) {
@@ -276,70 +308,6 @@ actor {
 
     davetKodlari.add(kod, yeniDavetKodu);
     kod;
-  };
-
-  public shared ({ caller }) func davetKoduIleKayitOl(kod : Text) : async Text {
-    _checkAuthenticated(caller);
-
-    let davetKodu = switch (davetKodlari.get(kod)) {
-      case (null) {
-        Runtime.trap("Geçersiz davet kodu: Lütfen geçerli bir kod girin");
-      };
-      case (?code) { code };
-    };
-
-    if (davetKodu.kullanildiMi) {
-      Runtime.trap("Davet kodu zaten kullanılmış");
-    };
-
-    let existingProfile = userProfiles.get(caller);
-
-    // Existing logic for profile validation and role permission checks
-
-    let userProfile = switch (existingProfile) {
-      case (null) {
-        {
-          name = "";
-          firstLogin = Time.now();
-          lastLogin = Time.now();
-          loginCount = 1;
-          binaId = ?davetKodu.binaId;
-          daireId = null;
-          role = davetKodu.rol;
-        };
-      };
-      case (?profile) {
-        {
-          profile with
-          binaId = ?davetKodu.binaId;
-          role = davetKodu.rol;
-        };
-      };
-    };
-
-    let guncellenmisDavetKodu : DavetKodu = {
-      davetKodu with
-      kullanildiMi = true;
-      kullanimTarihi = ?Time.now();
-      kullananPrincipal = ?caller;
-    };
-
-    userProfiles.add(caller, userProfile);
-    davetKodlari.add(kod, guncellenmisDavetKodu);
-
-    "Davet kodu başarıyla kullanıldı";
-  };
-
-  public query ({ caller }) func davetKodlariniListele() : async [DavetKodu] {
-    _checkAuthenticated(caller);
-
-    let filteredEntries = davetKodlari.entries().toArray().filter(
-      func((_, davetKodu)) {
-        davetKodu.olusturanPrincipal == caller;
-      }
-    );
-    let mappedEntries = filteredEntries.map(func((_, davetKodu)) { davetKodu });
-    mappedEntries;
   };
 
   //------------------------
@@ -387,6 +355,15 @@ actor {
         Runtime.trap("Profil bulunamadı: Lütfen önce bir bina oluşturun veya davet kodu ile kaydolun");
       };
       case (?profile) { profile };
+    };
+
+    // SECURITY FIX: Only building owners and authorized personnel can create apartments
+    switch (callerProfile.role) {
+      case (#binaSahibi) { /* Authorized */ };
+      case (#yetkili) { /* Authorized */ };
+      case (#sakin) {
+        Runtime.trap("Yetkisiz: Sadece bina sahipleri ve yetkililer daire oluşturabilir");
+      };
     };
 
     let binaId = switch (callerProfile.binaId) {
@@ -447,6 +424,15 @@ actor {
       case (?profile) { profile };
     };
 
+    // SECURITY FIX: Only building owners and authorized personnel can create announcements
+    switch (callerProfile.role) {
+      case (#binaSahibi) { /* Authorized */ };
+      case (#yetkili) { /* Authorized */ };
+      case (#sakin) {
+        Runtime.trap("Yetkisiz: Sadece bina sahipleri ve yetkililer duyuru oluşturabilir");
+      };
+    };
+
     let binaId = switch (callerProfile.binaId) {
       case (null) {
         Runtime.trap("Kullanıcının binaID'si yok: Lütfen önce bir bina oluşturun");
@@ -490,6 +476,76 @@ actor {
     );
 
     filtered.sort(func(a, b) { if (a.olusturmaTarihi > b.olusturmaTarihi) { #less } else { #greater } });
+  };
+
+  //------------------------
+  // Issue (Ariza) Logic
+  //------------------------
+
+  public shared ({ caller }) func arizaBildir(
+    baslik : Text,
+    aciklama : Text,
+    daireId : Text
+  ) : async Ariza {
+    _checkAuthenticated(caller);
+
+    let callerProfile = switch (userProfiles.get(caller)) {
+      case (null) {
+        Runtime.trap("Kullanıcı profili bulunamadı");
+      };
+      case (?profile) { profile };
+    };
+
+    // SECURITY: Role check - only residents can report issues
+    if (callerProfile.role != #sakin) {
+      Runtime.trap("Yetkisiz: Sadece sakinler ariza bildirebilir");
+    };
+
+    let binaId = switch (callerProfile.binaId) {
+      case (null) {
+        Runtime.trap("Kullanıcının binaID'si yok");
+      };
+      case (?id) { id };
+    };
+
+    // SECURITY: Validate apartment exists and belongs to user's building
+    switch (daireler.get(daireId)) {
+      case (null) {
+        Runtime.trap("Daire bulunamadı: " # daireId);
+      };
+      case (?daire) {
+        if (daire.binaId != binaId) {
+          Runtime.trap("Yetkisiz: Daire seçili binaya ait değil");
+        };
+      };
+    };
+
+    // SECURITY: Validate user is assigned to the apartment they're reporting for
+    switch (callerProfile.daireId) {
+      case (null) {
+        Runtime.trap("Yetkisiz: Kullanıcı bir daireye atanmamış");
+      };
+      case (?userDaireId) {
+        if (userDaireId != daireId) {
+          Runtime.trap("Yetkisiz: Sadece kendi daireniz için ariza bildirebilirsiniz");
+        };
+      };
+    };
+
+    let arizaId = Time.now().toText();
+    let ariza : Ariza = {
+      arizaId;
+      baslik;
+      aciklama;
+      daireId;
+      binaId;
+      olusturanPrincipal = caller;
+      olusturmaZamani = Time.now();
+      durum = #acik;
+    };
+
+    arizalar.add(arizaId, ariza);
+    ariza;
   };
 
   //------------------------

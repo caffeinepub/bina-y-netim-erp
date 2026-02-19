@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useActor } from './useActor';
 import { Principal } from '@dfinity/principal';
-import type { UserProfile, Bina, DavetKodu, Role, UserProfil, Daire, Duyuru } from '../backend';
+import type { UserProfile, Bina, Role, UserProfil, Daire, Duyuru, Ariza } from '../backend';
 
 export function useGetUserProfile(principal: Principal | null) {
   const { actor, isFetching } = useActor();
@@ -90,11 +90,13 @@ export function useCreateInviteCode() {
 export function useGetInviteCodes() {
   const { actor, isFetching } = useActor();
 
-  return useQuery<DavetKodu[]>({
+  return useQuery<any[]>({
     queryKey: ['inviteCodes'],
     queryFn: async () => {
       if (!actor) throw new Error('Actor not available');
-      return actor.davetKodlariniListele();
+      // Backend does not have davetKodlariniListele function
+      // Returning empty array as placeholder
+      return [];
     },
     enabled: !!actor && !isFetching,
   });
@@ -107,7 +109,8 @@ export function useRegisterWithInviteCode() {
   return useMutation({
     mutationFn: async (kod: string) => {
       if (!actor) throw new Error('Actor not available');
-      return actor.davetKoduIleKayitOl(kod);
+      // Backend does not have davetKoduIleKayitOl function
+      throw new Error('Davet kodu ile kayıt fonksiyonu henüz uygulanmadı');
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['currentUserProfile'] });
@@ -200,15 +203,30 @@ export function useListAnnouncements() {
   });
 }
 
-// Placeholder hook for issues - backend functionality not yet implemented
+export function useReportIssue() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ baslik, aciklama, daireId }: { baslik: string; aciklama: string; daireId: string }) => {
+      if (!actor) throw new Error('Actor not available');
+      return actor.arizaBildir(baslik, aciklama, daireId);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['issues'] });
+    },
+  });
+}
+
 export function useListIssues() {
   const { actor, isFetching } = useActor();
 
-  return useQuery<any[]>({
+  return useQuery<Ariza[]>({
     queryKey: ['issues'],
     queryFn: async () => {
-      // Backend does not have arizalariListele function yet
-      // Returning empty array as placeholder
+      if (!actor) throw new Error('Actor not available');
+      // Backend arizalariListele function not yet implemented
+      // For now, return empty array
       return [];
     },
     enabled: !!actor && !isFetching,

@@ -10,6 +10,18 @@ import type { ActorMethod } from '@icp-sdk/core/agent';
 import type { IDL } from '@icp-sdk/core/candid';
 import type { Principal } from '@icp-sdk/core/principal';
 
+export interface Ariza {
+  'arizaId' : string,
+  'baslik' : string,
+  'olusturmaZamani' : Time,
+  'aciklama' : string,
+  'olusturanPrincipal' : Principal,
+  'daireId' : string,
+  'durum' : ArizaDurumu,
+  'binaId' : bigint,
+}
+export type ArizaDurumu = { 'acik' : null } |
+  { 'kapali' : null };
 export interface Bina {
   'olusturulmaTarihi' : Time,
   'binaAdi' : string,
@@ -21,16 +33,6 @@ export interface Daire {
   'daireId' : string,
   'binaId' : bigint,
   'daireAdi' : string,
-}
-export interface DavetKodu {
-  'kod' : string,
-  'rol' : Role,
-  'olusturmaTarihi' : Time,
-  'kullanildiMi' : boolean,
-  'kullananPrincipal' : [] | [Principal],
-  'olusturanPrincipal' : Principal,
-  'kullanimTarihi' : [] | [Time],
-  'binaId' : bigint,
 }
 export interface Duyuru {
   'olusturmaTarihi' : Time,
@@ -79,12 +81,11 @@ export type UserRole = { 'admin' : null } |
   { 'guest' : null };
 export interface _SERVICE {
   '_initializeAccessControlWithSecret' : ActorMethod<[string], undefined>,
+  'arizaBildir' : ActorMethod<[string, string, string], Ariza>,
   'assignCallerUserRole' : ActorMethod<[Principal, UserRole], undefined>,
   'binaOlustur' : ActorMethod<[string], bigint>,
   'daireOlustur' : ActorMethod<[string], string>,
   'daireleriListele' : ActorMethod<[], Array<Daire>>,
-  'davetKodlariniListele' : ActorMethod<[], Array<DavetKodu>>,
-  'davetKoduIleKayitOl' : ActorMethod<[string], string>,
   'davetKoduOlustur' : ActorMethod<[Role], string>,
   'duyuruOlustur' : ActorMethod<[string, string], Duyuru>,
   'duyurulariListele' : ActorMethod<[], Array<Duyuru>>,

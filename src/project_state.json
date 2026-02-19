@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 31,
+  "projectStateVersion": 33,
   "summary": "Bina Yönetim ERP Uygulaması - Multi-tenant, rol bazlı bina yönetim sistemi. Internet Identity tek kimlik doğrulama yöntemi. Davet kodu giriş yöntemi değil, rol ve bina eşleştirme aracıdır. Kullanıcılar Internet Identity ile giriş yapar, binaya bağlı değilse davet kodu girer veya bina oluşturur. Onboarding akışı: Bina Sahibi (bina oluşturma), Yetkili (davet kodu), Sakin/Personel (davet kodu). Login ekranında 3 farklı onboarding akışı seçeneği aynı anda gösterilecek.",
   "architectural_notes": [
     "Internet Identity tek kimlik doğrulama yöntemi",
@@ -472,6 +472,46 @@
         "REQ-82"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-update-the-residentdashboard-component-frontend-src-pages-residentdashboard-tsx-to-display-a-comprehensive-announcements-list-section-showing-all-building-announcements-with-title-baslik-description-aciklama-creation-date-and-creator-information-in-a-card-based-layout-with-proper-spacing-and-turkish-section-header-duyurular",
+      "title": "Update the ResidentDashboard component (frontend/src/pages/ResidentDashboard.tsx) to display a comprehensive announcements list section showing all building announcements with title (baslik), description (aciklama), creation date, and creator information in a card-based layout with proper spacing and Turkish section header 'Duyurular'",
+      "reqIds": [
+        "REQ-83"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-an-issue-reporting-form-component-issuereportform-tsx-in-the-frontend-that-allows-sakin-users-to-report-building-issues-faults-with-input-fields-for-baslik-title-aciklama-description-and-daireid-apartment-selection-via-dropdown-form-validation-and-success-error-feedback-in-turkish",
+      "title": "Create an issue reporting form component (IssueReportForm.tsx) in the frontend that allows SAKIN users to report building issues/faults with input fields for baslik (title), aciklama (description), and daireId (apartment selection via dropdown), form validation, and success/error feedback in Turkish",
+      "reqIds": [
+        "REQ-84"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-react-query-mutation-hook-usereportissue-in-frontend-src-hooks-usequeries-ts-that-calls-the-arizabildir-backend-function-handles-loading-states-and-invalidates-the-issues-query-cache-on-successful-issue-creation",
+      "title": "Create React Query mutation hook useReportIssue in frontend/src/hooks/useQueries.ts that calls the arizaBildir backend function, handles loading states, and invalidates the 'issues' query cache on successful issue creation",
+      "reqIds": [
+        "REQ-86"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-integrate-the-issuereportform-component-into-the-residentdashboard-page-with-a-clear-turkish-section-header-ar-za-bildir-positioned-below-the-announcements-section-with-consistent-spacing-and-layout-matching-ownerdashboard-patterns",
+      "title": "Integrate the IssueReportForm component into the ResidentDashboard page with a clear Turkish section header 'Arıza Bildir', positioned below the announcements section with consistent spacing and layout matching OwnerDashboard patterns",
+      "reqIds": [
+        "REQ-87"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-residentdashboard-layout-to-organize-the-two-feature-sections-announcements-display-and-issue-reporting-in-a-clear-scannable-two-column-or-stacked-layout-with-proper-card-containers-consistent-with-ownerdashboard-and-managerdashboard-design-patterns",
+      "title": "Update the ResidentDashboard layout to organize the two feature sections (announcements display and issue reporting) in a clear, scannable two-column or stacked layout with proper card containers, consistent with OwnerDashboard and ManagerDashboard design patterns",
+      "reqIds": [
+        "REQ-88"
+      ],
+      "version": 1
     }
   ],
   "new_feature_requests": [
@@ -853,6 +893,44 @@
       "id": "AR-85",
       "summary": "Create visual apartment view/layout component in Owner Dashboard that displays all apartments in a grid or floor plan view",
       "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-86",
+      "summary": "Create announcement display component in Resident Dashboard that shows all building announcements in read-only format",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-87",
+      "summary": "Create issue reporting form in Resident Dashboard that allows SAKIN users to report issues/faults with title, description, and apartment selection",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-88",
+      "summary": "Implement backend function arizaBildir(baslik: Text, aciklama: Text, daireId: Text) that creates a new issue for the authenticated user",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-89",
+      "summary": "Update ResidentDashboard component to display announcements list and issue reporting form with proper layout and Turkish labels",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-90",
+      "summary": "Create React Query hook useReportIssue mutation in frontend/src/hooks/useQueries.ts for issue reporting functionality",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-93",
+      "summary": "Implement backend function arizaBildir(baslik: Text, aciklama: Text, daireId: Text) in backend/main.mo that creates a new Ariza record for the authenticated user's building, validates that the user has SAKIN role, generates a unique arizaId, stores it with status 'Açık' (open), and returns the created issue or appropriate error",
+      "reqIds": [
+        "REQ-85"
+      ],
       "status": "pending"
     }
   ],

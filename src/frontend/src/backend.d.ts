@@ -41,14 +41,14 @@ export interface UserProfil {
     daireId?: string;
     binaId?: bigint;
 }
-export interface DavetKodu {
-    kod: string;
-    rol: Role;
-    olusturmaTarihi: Time;
-    kullanildiMi: boolean;
-    kullananPrincipal?: Principal;
+export interface Ariza {
+    arizaId: string;
+    baslik: string;
+    olusturmaZamani: Time;
+    aciklama: string;
     olusturanPrincipal: Principal;
-    kullanimTarihi?: Time;
+    daireId: string;
+    durum: ArizaDurumu;
     binaId: bigint;
 }
 export interface Daire {
@@ -68,6 +68,10 @@ export interface RSVP {
     timestamp: Time;
     attending: boolean;
 }
+export enum ArizaDurumu {
+    acik = "acik",
+    kapali = "kapali"
+}
 export enum Role {
     yetkili = "yetkili",
     sakin = "sakin",
@@ -79,12 +83,11 @@ export enum UserRole {
     guest = "guest"
 }
 export interface backendInterface {
+    arizaBildir(baslik: string, aciklama: string, daireId: string): Promise<Ariza>;
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
     binaOlustur(binaAdi: string): Promise<bigint>;
     daireOlustur(daireAdi: string): Promise<string>;
     daireleriListele(): Promise<Array<Daire>>;
-    davetKodlariniListele(): Promise<Array<DavetKodu>>;
-    davetKoduIleKayitOl(kod: string): Promise<string>;
     davetKoduOlustur(yeniRol: Role): Promise<string>;
     duyuruOlustur(baslik: string, aciklama: string): Promise<Duyuru>;
     duyurulariListele(): Promise<Array<Duyuru>>;

@@ -1,68 +1,93 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-19T00:00:05.051Z",
+  "generatedAt": "2026-02-19T00:19:59.900Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 4,
-    "implemented": 4,
+    "total": 6,
+    "implemented": 5,
     "items": [
       {
-        "id": "REQ-79",
-        "summary": "Create a visual apartment layout grid component (DaireGorunumu.tsx) in the frontend that displays all apartments in an interactive grid/card layout, showing apartment name/number (daireAdi) on each card",
+        "id": "REQ-83",
+        "summary": "Update the ResidentDashboard component (frontend/src/pages/ResidentDashboard.tsx) to display a comprehensive announcements list section showing all building announcements with title (baslik), description (aciklama), creation date, and creator information in a card-based layout with proper spacing and Turkish section header 'Duyurular'",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/components/DaireGorunumu.tsx"
+          "frontend/src/pages/ResidentDashboard.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/components/DaireGorunumu.tsx"
+          "frontend/src/pages/ResidentDashboard.tsx"
         ]
       },
       {
-        "id": "REQ-80",
-        "summary": "Integrate the DaireGorunumu component into the OwnerDashboard page (frontend/src/pages/OwnerDashboard.tsx) as a new section titled 'Daire Görünümü' positioned after the existing apartment management section",
+        "id": "REQ-84",
+        "summary": "Create an issue reporting form component (IssueReportForm.tsx) in the frontend that allows SAKIN users to report building issues/faults with input fields for baslik (title), aciklama (description), and daireId (apartment selection via dropdown), form validation, and success/error feedback in Turkish",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/pages/OwnerDashboard.tsx"
+          "frontend/src/components/IssueReportForm.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/pages/OwnerDashboard.tsx"
+          "frontend/src/components/IssueReportForm.tsx"
         ]
       },
       {
-        "id": "REQ-81",
-        "summary": "Add visual indicators to apartment cards showing occupancy status: display a subtle badge or icon indicating whether the apartment is assigned to a user (based on checking if any user's daireId matches the apartment's daireId)",
+        "id": "REQ-85",
+        "summary": "Implement backend function arizaBildir(baslik: Text, aciklama: Text, daireId: Text) in backend/main.mo that creates a new Ariza record for the authenticated user's building, validates that the user has SAKIN role, generates a unique arizaId, stores it with status 'Açık' (open), and returns the created issue or appropriate error",
+        "status": "unknown",
+        "plannedFiles": [],
+        "matchedFiles": []
+      },
+      {
+        "id": "REQ-86",
+        "summary": "Create React Query mutation hook useReportIssue in frontend/src/hooks/useQueries.ts that calls the arizaBildir backend function, handles loading states, and invalidates the 'issues' query cache on successful issue creation",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/components/DaireGorunumu.tsx"
+          "frontend/src/hooks/useQueries.ts"
         ],
         "matchedFiles": [
-          "frontend/src/components/DaireGorunumu.tsx"
+          "frontend/src/hooks/useQueries.ts"
         ]
       },
       {
-        "id": "REQ-82",
-        "summary": "Implement hover interactions on apartment cards that display additional information in a tooltip or popover, including creation date (olusturmaTarihi) formatted in Turkish locale",
+        "id": "REQ-87",
+        "summary": "Integrate the IssueReportForm component into the ResidentDashboard page with a clear Turkish section header 'Arıza Bildir', positioned below the announcements section with consistent spacing and layout matching OwnerDashboard patterns",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/components/DaireGorunumu.tsx"
+          "frontend/src/pages/ResidentDashboard.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/components/DaireGorunumu.tsx"
+          "frontend/src/pages/ResidentDashboard.tsx"
+        ]
+      },
+      {
+        "id": "REQ-88",
+        "summary": "Update the ResidentDashboard layout to organize the two feature sections (announcements display and issue reporting) in a clear, scannable two-column or stacked layout with proper card containers, consistent with OwnerDashboard and ManagerDashboard design patterns",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/pages/ResidentDashboard.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/pages/ResidentDashboard.tsx"
         ]
       }
     ]
   },
   "changedFiles": [
+    "backend/main.mo",
+    "backend/migration.mo",
     "build-request.json",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/components/DaireGorunumu.tsx",
-    "frontend/src/pages/OwnerDashboard.tsx",
+    "frontend/src/backend.d.ts",
+    "frontend/src/backend.ts",
+    "frontend/src/components/IssueReportForm.tsx",
+    "frontend/src/declarations/backend.did.d.ts",
+    "frontend/src/declarations/backend.did.js",
+    "frontend/src/hooks/useQueries.ts",
+    "frontend/src/pages/ResidentDashboard.tsx",
     "frontend/src/utils/urlParams.ts",
     "project_state.json",
     "scratch/component-selection.json",

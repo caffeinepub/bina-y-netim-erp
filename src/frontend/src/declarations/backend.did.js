@@ -8,12 +8,26 @@
 
 import { IDL } from '@icp-sdk/core/candid';
 
+export const Time = IDL.Int;
+export const ArizaDurumu = IDL.Variant({
+  'acik' : IDL.Null,
+  'kapali' : IDL.Null,
+});
+export const Ariza = IDL.Record({
+  'arizaId' : IDL.Text,
+  'baslik' : IDL.Text,
+  'olusturmaZamani' : Time,
+  'aciklama' : IDL.Text,
+  'olusturanPrincipal' : IDL.Principal,
+  'daireId' : IDL.Text,
+  'durum' : ArizaDurumu,
+  'binaId' : IDL.Nat,
+});
 export const UserRole = IDL.Variant({
   'admin' : IDL.Null,
   'user' : IDL.Null,
   'guest' : IDL.Null,
 });
-export const Time = IDL.Int;
 export const Daire = IDL.Record({
   'olusturmaTarihi' : Time,
   'daireId' : IDL.Text,
@@ -24,16 +38,6 @@ export const Role = IDL.Variant({
   'yetkili' : IDL.Null,
   'sakin' : IDL.Null,
   'binaSahibi' : IDL.Null,
-});
-export const DavetKodu = IDL.Record({
-  'kod' : IDL.Text,
-  'rol' : Role,
-  'olusturmaTarihi' : Time,
-  'kullanildiMi' : IDL.Bool,
-  'kullananPrincipal' : IDL.Opt(IDL.Principal),
-  'olusturanPrincipal' : IDL.Principal,
-  'kullanimTarihi' : IDL.Opt(Time),
-  'binaId' : IDL.Nat,
 });
 export const Duyuru = IDL.Record({
   'olusturmaTarihi' : Time,
@@ -82,12 +86,11 @@ export const UserProfil = IDL.Record({
 
 export const idlService = IDL.Service({
   '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
+  'arizaBildir' : IDL.Func([IDL.Text, IDL.Text, IDL.Text], [Ariza], []),
   'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
   'binaOlustur' : IDL.Func([IDL.Text], [IDL.Nat], []),
   'daireOlustur' : IDL.Func([IDL.Text], [IDL.Text], []),
   'daireleriListele' : IDL.Func([], [IDL.Vec(Daire)], ['query']),
-  'davetKodlariniListele' : IDL.Func([], [IDL.Vec(DavetKodu)], ['query']),
-  'davetKoduIleKayitOl' : IDL.Func([IDL.Text], [IDL.Text], []),
   'davetKoduOlustur' : IDL.Func([Role], [IDL.Text], []),
   'duyuruOlustur' : IDL.Func([IDL.Text, IDL.Text], [Duyuru], []),
   'duyurulariListele' : IDL.Func([], [IDL.Vec(Duyuru)], ['query']),
@@ -111,12 +114,23 @@ export const idlService = IDL.Service({
 export const idlInitArgs = [];
 
 export const idlFactory = ({ IDL }) => {
+  const Time = IDL.Int;
+  const ArizaDurumu = IDL.Variant({ 'acik' : IDL.Null, 'kapali' : IDL.Null });
+  const Ariza = IDL.Record({
+    'arizaId' : IDL.Text,
+    'baslik' : IDL.Text,
+    'olusturmaZamani' : Time,
+    'aciklama' : IDL.Text,
+    'olusturanPrincipal' : IDL.Principal,
+    'daireId' : IDL.Text,
+    'durum' : ArizaDurumu,
+    'binaId' : IDL.Nat,
+  });
   const UserRole = IDL.Variant({
     'admin' : IDL.Null,
     'user' : IDL.Null,
     'guest' : IDL.Null,
   });
-  const Time = IDL.Int;
   const Daire = IDL.Record({
     'olusturmaTarihi' : Time,
     'daireId' : IDL.Text,
@@ -127,16 +141,6 @@ export const idlFactory = ({ IDL }) => {
     'yetkili' : IDL.Null,
     'sakin' : IDL.Null,
     'binaSahibi' : IDL.Null,
-  });
-  const DavetKodu = IDL.Record({
-    'kod' : IDL.Text,
-    'rol' : Role,
-    'olusturmaTarihi' : Time,
-    'kullanildiMi' : IDL.Bool,
-    'kullananPrincipal' : IDL.Opt(IDL.Principal),
-    'olusturanPrincipal' : IDL.Principal,
-    'kullanimTarihi' : IDL.Opt(Time),
-    'binaId' : IDL.Nat,
   });
   const Duyuru = IDL.Record({
     'olusturmaTarihi' : Time,
@@ -185,12 +189,11 @@ export const idlFactory = ({ IDL }) => {
   
   return IDL.Service({
     '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
+    'arizaBildir' : IDL.Func([IDL.Text, IDL.Text, IDL.Text], [Ariza], []),
     'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
     'binaOlustur' : IDL.Func([IDL.Text], [IDL.Nat], []),
     'daireOlustur' : IDL.Func([IDL.Text], [IDL.Text], []),
     'daireleriListele' : IDL.Func([], [IDL.Vec(Daire)], ['query']),
-    'davetKodlariniListele' : IDL.Func([], [IDL.Vec(DavetKodu)], ['query']),
-    'davetKoduIleKayitOl' : IDL.Func([IDL.Text], [IDL.Text], []),
     'davetKoduOlustur' : IDL.Func([Role], [IDL.Text], []),
     'duyuruOlustur' : IDL.Func([IDL.Text, IDL.Text], [Duyuru], []),
     'duyurulariListele' : IDL.Func([], [IDL.Vec(Duyuru)], ['query']),
