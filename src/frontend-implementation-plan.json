@@ -1,116 +1,124 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Fix blank screen after login - display role-specific dashboard content",
+  "title": "Fix infinite render loop and React Query refetch issues",
   "requirements": [
     {
-      "id": "REQ-92",
-      "summary": "Debug and fix post-authentication routing flow to ensure users are correctly redirected to role-specific dashboards after Internet Identity authentication",
+      "id": "REQ-97",
+      "summary": "Disable aggressive background refetching in useGetCallerUserProfile hook to prevent infinite query loop",
       "acceptanceCriteria": [
-        "After successful Internet Identity login, users with BINA_SAHIBI role are redirected to /owner-dashboard and see dashboard content",
-        "After successful Internet Identity login, users with YETKILI role are redirected to /manager-dashboard and see dashboard content",
-        "After successful Internet Identity login, users with SAKIN role are redirected to /resident-dashboard and see dashboard content",
-        "No blank screen appears after authentication completes",
-        "Console logs track the authentication state, user role fetching, and routing decisions for debugging"
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/App.tsx",
-          "operation": "modify",
-          "description": "Fix the role-based routing logic to properly wait for user profile data before making redirect decisions. Add defensive checks to ensure userProfile is loaded before attempting to access role property. Add console.log statements to track authentication state transitions, profile fetch status, and routing decisions. Ensure the ProtectedRoute wrapper properly handles loading states and waits for both authentication and profile data. Fix any race conditions where routing decisions are made before profile data is available."
-        }
-      ]
-    },
-    {
-      "id": "REQ-93",
-      "summary": "Verify user profile query properly fetches authenticated user's role and building association immediately after Internet Identity authentication with proper error handling",
-      "acceptanceCriteria": [
-        "User profile data (including role and binaId) is fetched immediately after authentication",
-        "Profile fetch errors are logged and displayed to users in Turkish",
-        "Loading states are properly handled while profile data is being fetched",
-        "Role-based routing waits for profile data before making redirect decisions"
+        "useGetCallerUserProfile hook includes refetchOnWindowFocus: false",
+        "useGetCallerUserProfile hook includes refetchOnReconnect: false",
+        "useGetCallerUserProfile hook includes staleTime set to at least 300000ms (5 minutes)",
+        "Profile fetching no longer triggers repeatedly in console logs"
       ],
       "file_operations": [
         {
           "path": "frontend/src/hooks/useQueries.ts",
           "operation": "modify",
-          "description": "Review and enhance the useGetCallerUserProfile hook to ensure it properly waits for the actor to be available before fetching. Verify the enabled condition checks both actor availability and authentication state. Add error handling that logs failures and returns user-friendly Turkish error messages. Ensure the hook returns proper loading states that downstream components can rely on. Add retry logic for transient failures. Verify the queryKey is correctly configured to trigger refetches when authentication state changes."
-        },
-        {
-          "path": "frontend/src/App.tsx",
-          "operation": "modify",
-          "description": "Add error boundary or error handling logic in App.tsx to catch and display profile fetch errors in Turkish. Show loading spinners or skeleton states while user profile is being fetched after authentication. Add console.log statements to track profile fetch lifecycle (pending, success, error states). Ensure routing logic waits for both isLoading and isFetching states to complete before making redirect decisions."
+          "description": "Update the useGetCallerUserProfile hook's useQuery configuration to add refetchOnWindowFocus: false, refetchOnReconnect: false, and staleTime: 300000 (5 minutes) to prevent aggressive background refetching that causes the infinite query loop"
         }
       ]
     },
     {
-      "id": "REQ-94",
-      "summary": "Add defensive checks in role-specific dashboard components to handle cases where user profile data is missing or incomplete",
+      "id": "REQ-98",
+      "summary": "Disable aggressive background refetching in useGetUserBuilding hook",
       "acceptanceCriteria": [
-        "Dashboard components display loading skeletons while profile data is being fetched",
-        "Dashboard components show Turkish error messages when profile data fails to load",
-        "Dashboard components gracefully handle null/undefined user data",
-        "Users see meaningful feedback instead of blank screens"
+        "useGetUserBuilding hook includes refetchOnWindowFocus: false",
+        "useGetUserBuilding hook includes refetchOnReconnect: false",
+        "useGetUserBuilding hook includes staleTime set to at least 300000ms (5 minutes)",
+        "Building query no longer triggers repeatedly in console logs"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/pages/OwnerDashboard.tsx",
+          "path": "frontend/src/hooks/useQueries.ts",
           "operation": "modify",
-          "description": "Add defensive checks at the component entry to verify userProfile exists and contains required fields (role, binaId). Display a loading skeleton using existing UI components while profile data is being fetched (check isLoading from useGetCallerUserProfile). Show a Turkish error message in a Card component if profile fetch fails or userProfile is null after loading completes. Add fallback rendering for when binaId is missing (e.g., 'Bina bilgisi yüklenemedi' message). Ensure all data dependencies (building, users, apartments) properly handle the case where parent profile data is unavailable."
-        },
-        {
-          "path": "frontend/src/pages/ManagerDashboard.tsx",
-          "operation": "modify",
-          "description": "Add defensive checks at the component entry to verify userProfile exists and contains required fields (role, binaId). Display a loading skeleton using Card components while profile data is being fetched. Show a Turkish error message if profile fetch fails or userProfile is null after loading completes (e.g., 'Kullanıcı profili yüklenemedi. Lütfen tekrar giriş yapın.'). Add fallback rendering for when binaId is missing. Ensure the issues list and invite code statistics properly handle missing profile data without crashing."
-        },
-        {
-          "path": "frontend/src/pages/ResidentDashboard.tsx",
-          "operation": "modify",
-          "description": "Add defensive checks at the component entry to verify userProfile exists and contains required fields (role, daireId). Display a loading skeleton using Card components while profile data is being fetched. Show a Turkish error message if profile fetch fails or userProfile is null after loading completes (e.g., 'Profil bilgileri yüklenemedi'). Add fallback rendering for when daireId is missing (e.g., 'Daire ataması yapılmamış' message). Ensure announcements list and issue report form handle missing profile data gracefully."
+          "description": "Update the useGetUserBuilding hook's useQuery configuration to add refetchOnWindowFocus: false, refetchOnReconnect: false, and staleTime: 300000 (5 minutes) to prevent unnecessary background refetching"
         }
       ]
     },
     {
-      "id": "REQ-95",
-      "summary": "Fix onboarding flow handling in Home.tsx to properly render onboarding UI for new users and role-based content for existing users",
+      "id": "REQ-99",
+      "summary": "Fix onboarding flow state management race condition by deferring clearOnboardingFlow() call",
       "acceptanceCriteria": [
-        "New users without building assignment see the onboarding section with 'Bina Oluştur' or 'Davet Kodu Gir' options",
-        "Users with building assignment and valid roles see appropriate role-based content",
-        "Home page does not render blank when user profile is loaded",
-        "Session storage onboarding flow values are properly retrieved and used"
+        "Session storage mode persists until the onboarding UI renders successfully",
+        "clearOnboardingFlow() is only called after mode state is used for rendering",
+        "Onboarding section displays correct UI based on flow type (building-owner, authority, resident)",
+        "No race condition between session storage read/write/clear operations"
       ],
       "file_operations": [
         {
           "path": "frontend/src/pages/Home.tsx",
           "operation": "modify",
-          "description": "Review and fix the conditional rendering logic that determines whether to show onboarding UI vs. role-based dashboard content. Verify that the check for userProfile.binaId properly distinguishes between new users (no building) and existing users (has building). Ensure sessionStorage.getItem('onboardingFlow') is correctly retrieved and used to render the appropriate onboarding section (binaSahibiFlow, yetkiliFlow, sakinFlow). Add defensive null checks for userProfile before accessing properties. Add loading states while profile is being fetched. Fix any logic that causes blank rendering when profile is available but conditions are not properly evaluated. Add console.log statements to debug which rendering path is taken."
+          "description": "Modify the useEffect hook that handles onboarding flow initialization to defer the clearOnboardingFlow() call until after the mode has been set in local state and the component has rendered at least once with that mode. Use a separate useEffect with mode as a dependency or a setTimeout to ensure the onboarding UI renders before session storage is cleared"
         }
       ]
     },
     {
-      "id": "REQ-96",
-      "summary": "Verify React Query cache invalidation logic properly refreshes user profile data after building creation, invite code registration, and role assignment operations",
+      "id": "REQ-100",
+      "summary": "Add loading state guards in App.tsx to prevent premature rendering during authentication",
       "acceptanceCriteria": [
-        "After building creation, user profile is re-fetched and UI updates to show role-based dashboard",
-        "After invite code registration, user profile is re-fetched and UI updates to show role-based dashboard",
-        "Cache invalidation occurs automatically after successful mutations",
-        "No manual page refresh is required to see updated user state"
+        "App.tsx checks isLoading state for both profile and building queries before routing",
+        "Loading state displayed to user while queries are in progress",
+        "Routing decisions only made after query data is available",
+        "No blank screens or rapid route switching during authentication"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "modify",
+          "description": "Add loading state guards in the ProtectedRoute component and main routing logic to check both profileLoading and buildingLoading states before rendering child routes or making routing decisions. Display a Turkish loading message ('Yükleniyor...') while either query is in progress to prevent blank screens and route flickering"
+        }
+      ]
+    },
+    {
+      "id": "REQ-101",
+      "summary": "Update all list query hooks to disable unnecessary background refetching",
+      "acceptanceCriteria": [
+        "All list query hooks include refetchOnWindowFocus: false",
+        "All list query hooks include refetchOnReconnect: false",
+        "Query refetching only occurs when explicitly triggered via mutations or manual refetch",
+        "Console logs show reduced query activity"
       ],
       "file_operations": [
         {
           "path": "frontend/src/hooks/useQueries.ts",
           "operation": "modify",
-          "description": "Review and verify that useCreateBuilding mutation includes queryClient.invalidateQueries(['currentUserProfile']) in its onSuccess callback to trigger profile refetch after building creation. Review and verify that the invite code registration mutation (if exists, or add it if missing) includes queryClient.invalidateQueries(['currentUserProfile']) in its onSuccess callback. Ensure all mutations that affect user state (building creation, role assignment, invite code usage) properly invalidate the currentUserProfile query key. Add console.log statements in onSuccess callbacks to confirm invalidation is triggered. Verify queryClient is properly imported and used in all relevant mutation hooks."
-        },
+          "description": "Update all list query hooks (useListInviteCodes, useListBuildingUsers, useListApartments, useListAnnouncements, useListIssues) to include refetchOnWindowFocus: false and refetchOnReconnect: false in their useQuery configuration to prevent unnecessary background refetching while preserving cache invalidation logic for mutations"
+        }
+      ]
+    },
+    {
+      "id": "REQ-102",
+      "summary": "Add defensive null/undefined checks in ProtectedRoute component with Turkish error messages",
+      "acceptanceCriteria": [
+        "ProtectedRoute checks for complete profile data before rendering children",
+        "Loading message displayed in Turkish while profile is being fetched",
+        "Error message displayed in Turkish if profile fetch fails",
+        "No alternating between different UI states"
+      ],
+      "file_operations": [
         {
-          "path": "frontend/src/components/BuildingCreateForm.tsx",
+          "path": "frontend/src/App.tsx",
           "operation": "modify",
-          "description": "Verify that after successful building creation, the component either triggers a profile refetch or relies on the mutation's cache invalidation. Add a callback or navigation logic that waits for profile refetch to complete before redirecting or updating UI. Ensure success toast appears and user sees updated state without manual refresh. Add console.log to track post-creation flow."
-        },
+          "description": "Add defensive null/undefined checks in the ProtectedRoute component to verify that userProfile is complete and not null before rendering child components. Display 'Profil yükleniyor...' during loading state and 'Profil verisi alınamadı' if profile fetch fails or data is incomplete, preventing UI state alternation"
+        }
+      ]
+    },
+    {
+      "id": "REQ-103",
+      "summary": "Add fallback session storage check in Home page onboarding section",
+      "acceptanceCriteria": [
+        "Home page checks session storage if local mode state is null",
+        "Correct onboarding UI renders even if initial state setup had timing issues",
+        "No empty/default state displayed when user selected a specific flow",
+        "Session storage acts as source of truth when local state is missing"
+      ],
+      "file_operations": [
         {
-          "path": "frontend/src/components/InviteCodeRegistration.tsx",
+          "path": "frontend/src/pages/Home.tsx",
           "operation": "modify",
-          "description": "Verify that after successful invite code registration, the component triggers cache invalidation for currentUserProfile. Add logic to wait for profile refetch to complete before showing success message or redirecting. Ensure the UI updates to reflect the new role and building assignment without requiring manual page refresh. Add console.log statements to track registration and profile update flow."
+          "description": "Update the onboarding section conditional rendering logic to add a fallback that attempts to retrieve the flow from session storage one more time if the local mode state is null, ensuring the correct onboarding UI renders even when there are timing issues with initial state setup"
         }
       ]
     }

@@ -1,18 +1,18 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-19T01:50:37.746Z",
+  "generatedAt": "2026-02-19T03:23:48.563Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 5,
-    "implemented": 5,
+    "total": 7,
+    "implemented": 7,
     "items": [
       {
-        "id": "REQ-92",
-        "summary": "Debug and fix the post-authentication routing flow in frontend/src/App.tsx to ensure users are correctly redirected to their role-specific dashboards (OwnerDashboard, ManagerDashboard, or ResidentDashboard) after Internet Identity authentication completes, preventing the blank screen issue",
+        "id": "REQ-100",
+        "summary": "Add loading state guards in frontend/src/App.tsx post-authentication routing logic to prevent rendering or redirecting until both the user profile query and building query have completed loading, displaying a loading spinner or message while data is being fetched",
         "status": "implemented",
         "plannedFiles": [
           "frontend/src/App.tsx"
@@ -22,55 +22,69 @@
         ]
       },
       {
-        "id": "REQ-93",
-        "summary": "Verify that the user profile query in frontend/src/App.tsx properly fetches the authenticated user's role and building association immediately after Internet Identity authentication, with proper error handling for failed profile fetches",
+        "id": "REQ-101",
+        "summary": "Update all other React Query hooks in frontend/src/hooks/useQueries.ts (useListInviteCodes, useListBuildingUsers, useListApartments, useListAnnouncements, useListIssues) to include refetchOnWindowFocus: false and refetchOnReconnect: false to prevent unnecessary background refetching",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/hooks/useQueries.ts",
-          "frontend/src/App.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/hooks/useQueries.ts",
-          "frontend/src/App.tsx"
-        ]
-      },
-      {
-        "id": "REQ-94",
-        "summary": "Add defensive checks in the role-specific dashboard components (OwnerDashboard.tsx, ManagerDashboard.tsx, ResidentDashboard.tsx) to handle cases where user profile data is missing or incomplete, displaying appropriate loading states or error messages in Turkish",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/pages/OwnerDashboard.tsx",
-          "frontend/src/pages/ManagerDashboard.tsx",
-          "frontend/src/pages/ResidentDashboard.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/pages/OwnerDashboard.tsx",
-          "frontend/src/pages/ManagerDashboard.tsx",
-          "frontend/src/pages/ResidentDashboard.tsx"
-        ]
-      },
-      {
-        "id": "REQ-95",
-        "summary": "Fix the onboarding flow handling in frontend/src/pages/Home.tsx to ensure the component properly renders onboarding UI for new users without buildings, and role-based dashboard content for existing users with building assignments",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/pages/Home.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/pages/Home.tsx"
-        ]
-      },
-      {
-        "id": "REQ-96",
-        "summary": "Verify that the React Query cache invalidation logic properly refreshes user profile data after building creation, invite code registration, and role assignment operations to ensure UI updates reflect the latest user state",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/hooks/useQueries.ts",
-          "frontend/src/components/BuildingCreateForm.tsx",
-          "frontend/src/components/InviteCodeRegistration.tsx"
+          "frontend/src/hooks/useQueries.ts"
         ],
         "matchedFiles": [
           "frontend/src/hooks/useQueries.ts"
+        ]
+      },
+      {
+        "id": "REQ-102",
+        "summary": "Add defensive null/undefined checks in the ProtectedRoute component (frontend/src/App.tsx) to prevent rendering child components when user profile data is incomplete or missing, displaying a Turkish loading message ('Profil yükleniyor...') or error message ('Profil verisi alınamadı') as appropriate",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/App.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/App.tsx"
+        ]
+      },
+      {
+        "id": "REQ-103",
+        "summary": "Update the Home page (frontend/src/pages/Home.tsx) onboarding section conditional rendering to add a fallback that retrieves the onboarding flow from session storage one more time if the local mode state is null, preventing the default empty state from rendering when a flow was actually selected",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/pages/Home.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/pages/Home.tsx"
+        ]
+      },
+      {
+        "id": "REQ-97",
+        "summary": "Update React Query configuration in useGetCallerUserProfile hook (frontend/src/hooks/useQueries.ts) to disable aggressive background refetching by setting refetchOnWindowFocus to false, refetchOnReconnect to false, and staleTime to a reasonable duration (e.g., 5 minutes) to prevent the infinite query loop",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/hooks/useQueries.ts"
+        ],
+        "matchedFiles": [
+          "frontend/src/hooks/useQueries.ts"
+        ]
+      },
+      {
+        "id": "REQ-98",
+        "summary": "Update React Query configuration in useGetUserBuilding hook (frontend/src/hooks/useQueries.ts) to disable aggressive background refetching by setting refetchOnWindowFocus to false, refetchOnReconnect to false, and staleTime to a reasonable duration (e.g., 5 minutes)",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/hooks/useQueries.ts"
+        ],
+        "matchedFiles": [
+          "frontend/src/hooks/useQueries.ts"
+        ]
+      },
+      {
+        "id": "REQ-99",
+        "summary": "Fix the onboarding flow state management race condition in frontend/src/pages/Home.tsx by modifying the useEffect hook to only call clearOnboardingFlow() after the mode has been successfully set in local component state and the component has rendered with that mode at least once, preventing premature session storage clearing",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/pages/Home.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/pages/Home.tsx"
         ]
       }
     ]
@@ -83,9 +97,6 @@
     "frontend/src/App.tsx",
     "frontend/src/hooks/useQueries.ts",
     "frontend/src/pages/Home.tsx",
-    "frontend/src/pages/ManagerDashboard.tsx",
-    "frontend/src/pages/OwnerDashboard.tsx",
-    "frontend/src/pages/ResidentDashboard.tsx",
     "frontend/src/utils/urlParams.ts",
     "project_state.json",
     "scratch/component-selection.json",

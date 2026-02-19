@@ -2,30 +2,9 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-debug-and-fix-the-post-authentication-routing-flow-in-frontend-src-app-tsx-to-ensure-users-are-correctly-redirected-to-their-role-specific-dashboards-ownerdashboard-managerdashboard-or-residentdashboard-after-internet-identity-authentication-completes-preventing-the-blank-screen-issue",
-      "featureTitle": "Debug and fix the post-authentication routing flow in frontend/src/App.tsx to ensure users are correctly redirected to their role-specific dashboards (OwnerDashboard, ManagerDashboard, or ResidentDashboard) after Internet Identity authentication completes, preventing the blank screen issue",
+      "featureId": "feature-update-react-query-configuration-in-usegetcalleruserprofile-hook-frontend-src-hooks-usequeries-ts-to-disable-aggressive-background-refetching-by-setting-refetchonwindowfocus-to-false-refetchonreconnect-to-false-and-staletime-to-a-reasonable-duration-e-g-5-minutes-to-prevent-the-infinite-query-loop",
+      "featureTitle": "Update React Query configuration in useGetCallerUserProfile hook (frontend/src/hooks/useQueries.ts) to disable aggressive background refetching by setting refetchOnWindowFocus to false, refetchOnReconnect to false, and staleTime to a reasonable duration (e.g., 5 minutes) to prevent the infinite query loop",
       "files": [
-        "frontend/src/App.tsx"
-      ],
-      "components": [
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0",
-        "authorization@4.0.0",
-        "invite-links@3.0.0"
-      ],
-      "testIds": [
-        "REQ-92"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-verify-that-the-user-profile-query-in-frontend-src-app-tsx-properly-fetches-the-authenticated-user-s-role-and-building-association-immediately-after-internet-identity-authentication-with-proper-error-handling-for-failed-profile-fetches",
-      "featureTitle": "Verify that the user profile query in frontend/src/App.tsx properly fetches the authenticated user's role and building association immediately after Internet Identity authentication, with proper error handling for failed profile fetches",
-      "files": [
-        "frontend/src/App.tsx",
         "frontend/src/hooks/useQueries.ts"
       ],
       "components": [
@@ -38,17 +17,15 @@
         "invite-links@3.0.0"
       ],
       "testIds": [
-        "REQ-93"
+        "REQ-97"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-add-defensive-checks-in-the-role-specific-dashboard-components-ownerdashboard-tsx-managerdashboard-tsx-residentdashboard-tsx-to-handle-cases-where-user-profile-data-is-missing-or-incomplete-displaying-appropriate-loading-states-or-error-messages-in-turkish",
-      "featureTitle": "Add defensive checks in the role-specific dashboard components (OwnerDashboard.tsx, ManagerDashboard.tsx, ResidentDashboard.tsx) to handle cases where user profile data is missing or incomplete, displaying appropriate loading states or error messages in Turkish",
+      "featureId": "feature-update-react-query-configuration-in-usegetuserbuilding-hook-frontend-src-hooks-usequeries-ts-to-disable-aggressive-background-refetching-by-setting-refetchonwindowfocus-to-false-refetchonreconnect-to-false-and-staletime-to-a-reasonable-duration-e-g-5-minutes",
+      "featureTitle": "Update React Query configuration in useGetUserBuilding hook (frontend/src/hooks/useQueries.ts) to disable aggressive background refetching by setting refetchOnWindowFocus to false, refetchOnReconnect to false, and staleTime to a reasonable duration (e.g., 5 minutes)",
       "files": [
-        "frontend/src/pages/ManagerDashboard.tsx",
-        "frontend/src/pages/OwnerDashboard.tsx",
-        "frontend/src/pages/ResidentDashboard.tsx"
+        "frontend/src/hooks/useQueries.ts"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -60,13 +37,13 @@
         "invite-links@3.0.0"
       ],
       "testIds": [
-        "REQ-94"
+        "REQ-98"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-fix-the-onboarding-flow-handling-in-frontend-src-pages-home-tsx-to-ensure-the-component-properly-renders-onboarding-ui-for-new-users-without-buildings-and-role-based-dashboard-content-for-existing-users-with-building-assignments",
-      "featureTitle": "Fix the onboarding flow handling in frontend/src/pages/Home.tsx to ensure the component properly renders onboarding UI for new users without buildings, and role-based dashboard content for existing users with building assignments",
+      "featureId": "feature-fix-the-onboarding-flow-state-management-race-condition-in-frontend-src-pages-home-tsx-by-modifying-the-useeffect-hook-to-only-call-clearonboardingflow-after-the-mode-has-been-successfully-set-in-local-component-state-and-the-component-has-rendered-with-that-mode-at-least-once-preventing-premature-session-storage-clearing",
+      "featureTitle": "Fix the onboarding flow state management race condition in frontend/src/pages/Home.tsx by modifying the useEffect hook to only call clearOnboardingFlow() after the mode has been successfully set in local component state and the component has rendered with that mode at least once, preventing premature session storage clearing",
       "files": [
         "frontend/src/pages/Home.tsx"
       ],
@@ -80,13 +57,33 @@
         "invite-links@3.0.0"
       ],
       "testIds": [
-        "REQ-95"
+        "REQ-99"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-verify-that-the-react-query-cache-invalidation-logic-properly-refreshes-user-profile-data-after-building-creation-invite-code-registration-and-role-assignment-operations-to-ensure-ui-updates-reflect-the-latest-user-state",
-      "featureTitle": "Verify that the React Query cache invalidation logic properly refreshes user profile data after building creation, invite code registration, and role assignment operations to ensure UI updates reflect the latest user state",
+      "featureId": "feature-add-loading-state-guards-in-frontend-src-app-tsx-post-authentication-routing-logic-to-prevent-rendering-or-redirecting-until-both-the-user-profile-query-and-building-query-have-completed-loading-displaying-a-loading-spinner-or-message-while-data-is-being-fetched",
+      "featureTitle": "Add loading state guards in frontend/src/App.tsx post-authentication routing logic to prevent rendering or redirecting until both the user profile query and building query have completed loading, displaying a loading spinner or message while data is being fetched",
+      "files": [
+        "frontend/src/App.tsx"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "authorization@4.0.0",
+        "invite-links@3.0.0"
+      ],
+      "testIds": [
+        "REQ-100"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-update-all-other-react-query-hooks-in-frontend-src-hooks-usequeries-ts-uselistinvitecodes-uselistbuildingusers-uselistapartments-uselistannouncements-uselistissues-to-include-refetchonwindowfocus-false-and-refetchonreconnect-false-to-prevent-unnecessary-background-refetching",
+      "featureTitle": "Update all other React Query hooks in frontend/src/hooks/useQueries.ts (useListInviteCodes, useListBuildingUsers, useListApartments, useListAnnouncements, useListIssues) to include refetchOnWindowFocus: false and refetchOnReconnect: false to prevent unnecessary background refetching",
       "files": [
         "frontend/src/hooks/useQueries.ts"
       ],
@@ -100,7 +97,47 @@
         "invite-links@3.0.0"
       ],
       "testIds": [
-        "REQ-96"
+        "REQ-101"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-add-defensive-null-undefined-checks-in-the-protectedroute-component-frontend-src-app-tsx-to-prevent-rendering-child-components-when-user-profile-data-is-incomplete-or-missing-displaying-a-turkish-loading-message-profil-y-kleniyor-or-error-message-profil-verisi-al-namad-as-appropriate",
+      "featureTitle": "Add defensive null/undefined checks in the ProtectedRoute component (frontend/src/App.tsx) to prevent rendering child components when user profile data is incomplete or missing, displaying a Turkish loading message ('Profil yükleniyor...') or error message ('Profil verisi alınamadı') as appropriate",
+      "files": [
+        "frontend/src/App.tsx"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "authorization@4.0.0",
+        "invite-links@3.0.0"
+      ],
+      "testIds": [
+        "REQ-102"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-update-the-home-page-frontend-src-pages-home-tsx-onboarding-section-conditional-rendering-to-add-a-fallback-that-retrieves-the-onboarding-flow-from-session-storage-one-more-time-if-the-local-mode-state-is-null-preventing-the-default-empty-state-from-rendering-when-a-flow-was-actually-selected",
+      "featureTitle": "Update the Home page (frontend/src/pages/Home.tsx) onboarding section conditional rendering to add a fallback that retrieves the onboarding flow from session storage one more time if the local mode state is null, preventing the default empty state from rendering when a flow was actually selected",
+      "files": [
+        "frontend/src/pages/Home.tsx"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "authorization@4.0.0",
+        "invite-links@3.0.0"
+      ],
+      "testIds": [
+        "REQ-103"
       ],
       "confidence": "high"
     }

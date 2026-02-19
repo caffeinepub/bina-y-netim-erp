@@ -15,7 +15,7 @@ import { getOnboardingFlow, clearOnboardingFlow } from '@/utils/urlParams';
 export default function Home() {
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [onboardingMode, setOnboardingMode] = useState<'building-owner' | 'authority' | 'resident' | null>(null);
-  const hasSetModeRef = useRef(false);
+  const hasInitializedRef = useRef(false);
   
   const { data: building, isLoading: buildingLoading, isFetched: buildingFetched, error: buildingError } = useGetUserBuilding();
   const { data: userProfile, isLoading: profileLoading, isFetched: profileFetched } = useGetCallerUserProfile();
@@ -27,15 +27,6 @@ export default function Home() {
   const isYetkili = userRole === Role.yetkili;
   const isSakin = userRole === Role.sakin;
 
-  console.log('Home: Render state', {
-    profileLoading,
-    profileFetched,
-    hasProfile: !!userProfile,
-    hasBuilding,
-    userRole,
-    onboardingMode,
-  });
-
   // Determine if user can create invite codes (BINA_SAHIBI or YETKILI)
   const canCreateInviteCodes = isBinaSahibi || isYetkili;
 
@@ -45,38 +36,38 @@ export default function Home() {
   const activeInviteCodes = totalInviteCodes - usedInviteCodes;
   const totalMembers = 1 + usedInviteCodes; // 1 for building owner + used codes
 
-  // Phase 1: Retrieve onboarding flow from session storage and set it to state
+  // Initialize onboarding mode from session storage once
   useEffect(() => {
-    if (profileFetched && !hasBuilding && !hasSetModeRef.current) {
+    if (!hasInitializedRef.current && profileFetched && !hasBuilding) {
       const flow = getOnboardingFlow();
-      console.log('Home: Checking onboarding flow, profileFetched=', profileFetched, 'hasBuilding=', hasBuilding, 'flow=', flow);
       
       if (flow === 'building-owner' || flow === 'authority' || flow === 'resident') {
-        console.log('Home: Setting onboarding mode to', flow);
         setOnboardingMode(flow);
-        hasSetModeRef.current = true;
+        // Clear session storage after successfully setting the mode
+        setTimeout(() => {
+          clearOnboardingFlow();
+        }, 100);
       }
+      
+      hasInitializedRef.current = true;
     }
   }, [profileFetched, hasBuilding]);
 
-  // Phase 2: Clear session storage only after mode has been set and component has rendered
+  // Reset initialization flag when user gets a building
   useEffect(() => {
-    if (onboardingMode !== null && hasSetModeRef.current) {
-      console.log('Home: Mode is set to', onboardingMode, '- clearing session storage');
-      clearOnboardingFlow();
-      console.log('Home: Cleared onboarding flow from storage');
+    if (hasBuilding) {
+      hasInitializedRef.current = false;
+      setOnboardingMode(null);
     }
-  }, [onboardingMode]);
+  }, [hasBuilding]);
 
   const handleCreateSuccess = () => {
     setShowCreateForm(false);
     setOnboardingMode(null);
-    hasSetModeRef.current = false;
   };
 
   const handleInviteCodeSuccess = () => {
     setOnboardingMode(null);
-    hasSetModeRef.current = false;
   };
 
   // Role-based conditional rendering infrastructure
@@ -145,12 +136,6 @@ export default function Home() {
   const renderOnboardingSection = () => {
     // Defensive fallback: check session storage if mode is null
     const effectiveMode = onboardingMode || getOnboardingFlow();
-    
-    if (effectiveMode !== onboardingMode && effectiveMode) {
-      console.log('Home: Using fallback mode from session storage:', effectiveMode);
-    }
-    
-    console.log('Home: Rendering onboarding section, mode=', onboardingMode, 'effectiveMode=', effectiveMode);
     
     // If onboarding mode is set, show the specific flow
     if (effectiveMode === 'building-owner') {
@@ -266,37 +251,41 @@ export default function Home() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <InviteCodeRegistration onSuccess={handleInviteCodeSuccess} />
+                  <Button 
+                    onClick={() => setOnboardingMode('resident')}
+                    variant="outline"
+                    className="w-full"
+                  >
+                    <Plus className="mr-2 h-4 w-4" />
+                    Katıl
+                  </Button>
                 </CardContent>
               </Card>
             </div>
+
+            {showCreateForm && (
+              <div className="pt-6 border-t">
+                <BuildingCreateForm onSuccess={handleCreateSuccess} />
+              </div>
+            )}
           </CardContent>
         </Card>
-
-        {showCreateForm && (
-          <BuildingCreateForm onSuccess={handleCreateSuccess} />
-        )}
       </div>
     );
   };
 
+  // Loading state
   if (profileLoading || buildingLoading) {
-    console.log('Home: Showing loading skeleton');
     return (
       <div className="container mx-auto p-6 space-y-6">
         <Skeleton className="h-12 w-64" />
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Skeleton className="h-32" />
-          <Skeleton className="h-32" />
-          <Skeleton className="h-32" />
-        </div>
+        <Skeleton className="h-64 w-full" />
       </div>
     );
   }
 
-  // Show onboarding if user doesn't have a building
+  // Main render logic
   if (!hasBuilding) {
-    console.log('Home: No building, showing onboarding');
     return (
       <div className="container mx-auto p-6">
         {renderOnboardingSection()}
@@ -304,58 +293,75 @@ export default function Home() {
     );
   }
 
-  // Show role-based content if user has a building
-  console.log('Home: Has building, showing role-based content');
+  // User has a building - show role-based content
   return (
     <div className="container mx-auto p-6 space-y-6">
-      <div className="space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight">Ana Sayfa</h1>
-        <p className="text-muted-foreground">
-          Bina yönetim sisteminize hoş geldiniz
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Ana Sayfa</h1>
+          <p className="text-muted-foreground">
+            Bina yönetim sisteminize hoş geldiniz
+          </p>
+        </div>
       </div>
 
-      {renderRoleBasedContent()}
-
-      <div className="grid gap-6 md:grid-cols-3">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Toplam Üyeler</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{totalMembers}</div>
-            <p className="text-xs text-muted-foreground">
-              Aktif kullanıcı sayısı
-            </p>
-          </CardContent>
-        </Card>
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {renderRoleBasedContent()}
 
         {canCreateInviteCodes && (
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Aktif Davet Kodları</CardTitle>
-              <TrendingUp className="h-4 w-4 text-muted-foreground" />
+          <Card className="md:col-span-2">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Users className="h-5 w-5" />
+                Davet Kodları
+              </CardTitle>
+              <CardDescription>
+                Yeni üyeler eklemek için davet kodları oluşturun
+              </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{activeInviteCodes}</div>
-              <p className="text-xs text-muted-foreground">
-                Kullanılabilir davet kodu
-              </p>
+              <InviteCodePanel />
             </CardContent>
           </Card>
         )}
+      </div>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Sistem Durumu</CardTitle>
-            <Activity className="h-4 w-4 text-muted-foreground" />
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <Card className="hover:shadow-lg transition-shadow">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <Activity className="h-5 w-5 text-blue-600" />
+              Hızlı İşlemler
+            </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-green-600">Aktif</div>
-            <p className="text-xs text-muted-foreground">
-              Tüm sistemler çalışıyor
-            </p>
+          <CardContent className="space-y-2">
+            <Button variant="outline" className="w-full justify-start">
+              <Bell className="mr-2 h-4 w-4" />
+              Duyuru Oluştur
+            </Button>
+            <Button variant="outline" className="w-full justify-start">
+              <Users className="mr-2 h-4 w-4" />
+              Üyeleri Görüntüle
+            </Button>
+          </CardContent>
+        </Card>
+
+        <Card className="hover:shadow-lg transition-shadow">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <TrendingUp className="h-5 w-5 text-green-600" />
+              İstatistikler
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div className="flex justify-between items-center">
+              <span className="text-sm text-muted-foreground">Toplam Üye</span>
+              <span className="text-lg font-bold">{totalMembers}</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-sm text-muted-foreground">Aktif Kodlar</span>
+              <span className="text-lg font-bold">{activeInviteCodes}</span>
+            </div>
           </CardContent>
         </Card>
       </div>

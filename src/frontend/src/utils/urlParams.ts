@@ -209,7 +209,7 @@ export function getSecretParameter(paramName: string): string | null {
 
 /**
  * Onboarding flow management
- * These functions help persist the user's selected onboarding path through Internet Identity authentication
+ * These functions help persist the user's selected onboarding flow through Internet Identity authentication
  */
 
 const ONBOARDING_FLOW_KEY = 'onboardingFlow';
@@ -221,7 +221,6 @@ const ONBOARDING_FLOW_KEY = 'onboardingFlow';
  * @param flowType - The type of onboarding flow selected
  */
 export function storeOnboardingFlow(flowType: 'building-owner' | 'authority' | 'resident'): void {
-    console.log('urlParams: Storing onboarding flow:', flowType);
     storeSessionParameter(ONBOARDING_FLOW_KEY, flowType);
 }
 
@@ -232,15 +231,16 @@ export function storeOnboardingFlow(flowType: 'building-owner' | 'authority' | '
  */
 export function getOnboardingFlow(): 'building-owner' | 'authority' | 'resident' | null {
     const flow = getSessionParameter(ONBOARDING_FLOW_KEY);
-    console.log('urlParams: Retrieved onboarding flow:', flow);
-    return flow as 'building-owner' | 'authority' | 'resident' | null;
+    if (flow === 'building-owner' || flow === 'authority' || flow === 'resident') {
+        return flow;
+    }
+    return null;
 }
 
 /**
  * Clears the stored onboarding flow from session storage
- * Should be called after the onboarding flow has been processed
+ * Should be called after the flow has been successfully processed
  */
 export function clearOnboardingFlow(): void {
-    console.log('urlParams: Clearing onboarding flow');
     clearSessionParameter(ONBOARDING_FLOW_KEY);
 }

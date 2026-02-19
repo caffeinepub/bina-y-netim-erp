@@ -13,6 +13,9 @@ export function useGetUserProfile(principal: Principal | null) {
       return actor.getUserProfile(principal);
     },
     enabled: !!actor && !isFetching && !!principal,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    staleTime: 300000, // 5 minutes
   });
 }
 
@@ -23,22 +26,15 @@ export function useGetCallerUserProfile() {
     queryKey: ['currentUserProfile'],
     queryFn: async () => {
       if (!actor) throw new Error('Actor not available');
-      console.log('useGetCallerUserProfile: Fetching profile...');
       const profile = await actor.getCallerUserProfile();
-      console.log('useGetCallerUserProfile: Profile fetched:', profile);
       return profile;
     },
     enabled: !!actor && !actorFetching,
     retry: 1,
     retryDelay: 1000,
-  });
-
-  console.log('useGetCallerUserProfile: Query state', {
-    actorFetching,
-    isLoading: query.isLoading,
-    isFetched: query.isFetched,
-    hasData: !!query.data,
-    error: query.error?.message,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    staleTime: 300000, // 5 minutes
   });
 
   return {
@@ -55,14 +51,15 @@ export function useGetUserBuilding() {
     queryKey: ['userBuilding'],
     queryFn: async () => {
       if (!actor) throw new Error('Actor not available');
-      console.log('useGetUserBuilding: Fetching building...');
       const building = await actor.kullaniciBinasiniGetir();
-      console.log('useGetUserBuilding: Building fetched:', building);
       return building;
     },
     enabled: !!actor && !actorFetching,
     retry: 1,
     retryDelay: 1000,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    staleTime: 300000, // 5 minutes
   });
 
   return {
@@ -79,13 +76,10 @@ export function useCreateBuilding() {
   return useMutation({
     mutationFn: async (binaAdi: string) => {
       if (!actor) throw new Error('Actor not available');
-      console.log('useCreateBuilding: Creating building:', binaAdi);
       const result = await actor.binaOlustur(binaAdi);
-      console.log('useCreateBuilding: Building created with ID:', result);
       return result;
     },
     onSuccess: () => {
-      console.log('useCreateBuilding: Invalidating queries...');
       queryClient.invalidateQueries({ queryKey: ['userBuilding'] });
       queryClient.invalidateQueries({ queryKey: ['currentUserProfile'] });
     },
@@ -119,6 +113,8 @@ export function useGetInviteCodes() {
       return [];
     },
     enabled: !!actor && !isFetching,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
   });
 }
 
@@ -129,12 +125,10 @@ export function useRegisterWithInviteCode() {
   return useMutation({
     mutationFn: async (kod: string) => {
       if (!actor) throw new Error('Actor not available');
-      console.log('useRegisterWithInviteCode: Registering with code:', kod);
       // Backend does not have davetKoduIleKayitOl function
       throw new Error('Davet kodu ile kayıt fonksiyonu henüz uygulanmadı');
     },
     onSuccess: () => {
-      console.log('useRegisterWithInviteCode: Invalidating queries...');
       queryClient.invalidateQueries({ queryKey: ['currentUserProfile'] });
       queryClient.invalidateQueries({ queryKey: ['userBuilding'] });
     },
@@ -166,6 +160,8 @@ export function useListBuildingUsers() {
       return actor.kullanicilariListele();
     },
     enabled: !!actor && !isFetching,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
   });
 }
 
@@ -194,6 +190,8 @@ export function useListApartments() {
       return actor.daireleriListele();
     },
     enabled: !!actor && !isFetching,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
   });
 }
 
@@ -222,6 +220,8 @@ export function useListAnnouncements() {
       return actor.duyurulariListele();
     },
     enabled: !!actor && !isFetching,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
   });
 }
 
@@ -252,5 +252,7 @@ export function useListIssues() {
       return [];
     },
     enabled: !!actor && !isFetching,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
   });
 }
